@@ -361,3 +361,57 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/Assets/textures/Gradients
+/Assets/VRCAvatars3Tools
+/Assets/Unity Shaders/Cubeds-Unity-Shaders-master/Assets/Cubed's Unity Shaders/Shaders
+/Assets/Tiger's Bingo XD
+/Assets/Scenes
+/Assets/Lyuma/Av3Emulator
+/Assets/Kylin VRc
+/Assets/Inventory Inventor
+/Assets/Hirabiki/VRCLens
+/Assets/Gizmos/InventoryInventor/Preset
+/Assets/Face Tracking Setup
+/Assets/DynamicBone
+/Assets/DotTranquil/anim
+/Library
+/Assets/_PoiyomiShaders
+/Assets/WeFixUrProblem
+/Assets/VRLabs/Avatars 3.0 Manager
+/Assets/VRCSDK
+/Assets/VRChat Avatar Height Chart
+/Assets/Sit_Pose_By_Manish.anim
+/Assets/prefab-id-v1_avtr_f0d12a2e-f980-474b-a331-4c91a744673c_8517975691.prefab
+/Assets/prefab-id-v1_avtr_f0d12a2e-f980-474b-a331-4c91a744673c_7391243656.prefab
+/Thry
+/Temp
+/Resources
+/ProjectSettings
+/VRC.SDKBase.Editor.ShaderStripping.csproj
+/VRC.SDKBase.Editor.BuildPipeline.Player.csproj
+/VRC.SDKBase.Editor.BuildPipeline.csproj
+/UnityEngine.UI.Player.csproj
+/UnityEngine.UI.csproj
+/UnityEngine.TestRunner.Player.csproj
+/UnityEngine.TestRunner.csproj
+/UnityEditor.UI.csproj
+/UnityEditor.TestRunner.csproj
+/Unity.XR.Oculus.Editor.csproj
+/Unity.VSCode.Editor.csproj
+/Unity.VisualStudio.Editor.csproj
+/Unity.Timeline.Player.csproj
+/Unity.Timeline.Editor.csproj
+/Unity.Timeline.csproj
+/Unity.TextMeshPro.Player.csproj
+/Unity.TextMeshPro.Editor.csproj
+/Unity.TextMeshPro.csproj
+/Unity.Rider.Editor.csproj
+/Unity.PlasticSCM.Editor.csproj
+/Unity.CollabProxy.Editor.csproj
+/ThryAssemblyDefinition.csproj
+/Kylin Test.sln
+/Assembly-CSharp.Player.csproj
+/Assembly-CSharp.csproj
+/Assembly-CSharp-Editor.csproj
+/.vsconfig
+/Assets/VRCFaceTracking/Tools/Binary Parameter Tool/Editor/Test.controller
