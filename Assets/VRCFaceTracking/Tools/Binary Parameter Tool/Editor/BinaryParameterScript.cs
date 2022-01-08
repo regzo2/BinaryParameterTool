@@ -58,15 +58,7 @@ public class BinaryParameterScript
         }
 
         // Creating a layer object since the default weight can not be assigned after creation.
-        /*
-        var layer = new UnityEditor.Animations.AnimatorControllerLayer
-        {
-            name = baseParamName + " Binary",
-            defaultWeight = 1f,
-            stateMachine = new UnityEditor.Animations.AnimatorStateMachine()
-        };
-        */
-
+        
         animatorController.AddLayer(baseParamName + " Binary");
 
         var rootStateMachine = animatorController.layers[animatorController.layers.Length - 1].stateMachine;
@@ -201,18 +193,9 @@ public class BinaryParameterScript
         }
 
         // Creating a layer object since the default weight can not be assigned after creation.
-        var layer = new UnityEditor.Animations.AnimatorControllerLayer
-        {
-            name = baseParamName + " Binary",
-            defaultWeight = 1f,
-            stateMachine = new UnityEditor.Animations.AnimatorStateMachine()
-        };
+        animatorController.AddLayer(baseParamName + " Binary");
 
-        animatorController.AddLayer(layer);
-
-        var binaryLayer = animatorController.layers[animatorController.layers.Length - 1];
-
-        var rootStateMachine = binaryLayer.stateMachine;
+        var rootStateMachine = animatorController.layers[animatorController.layers.Length - 1].stateMachine;
         AnimatorState[] states = new AnimatorState[binarySize];
 
         // Creates a State with the user defined animations, then hooks it to the AnyState with transitions containing binary conditions, and user defined rules.
