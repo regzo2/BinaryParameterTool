@@ -68,7 +68,6 @@ public class BinaryParameterScript
         animatorController.AddLayer(layer);
 
         var binaryLayer = animatorController.layers[animatorController.layers.Length - 1];
-        binaryLayer.defaultWeight = 1f;
 
         var rootStateMachine = binaryLayer.stateMachine;
         AnimatorState[] states = new AnimatorState[binarySize];
@@ -211,7 +210,6 @@ public class BinaryParameterScript
         animatorController.AddLayer(layer);
 
         var binaryLayer = animatorController.layers[animatorController.layers.Length - 1];
-        binaryLayer.defaultWeight = 1f;
 
         var rootStateMachine = binaryLayer.stateMachine;
         AnimatorState[] states = new AnimatorState[binarySize];
