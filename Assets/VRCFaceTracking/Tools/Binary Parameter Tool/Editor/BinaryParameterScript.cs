@@ -58,18 +58,18 @@ public class BinaryParameterScript
         }
 
         // Creating a layer object since the default weight can not be assigned after creation.
+        /*
         var layer = new UnityEditor.Animations.AnimatorControllerLayer
         {
             name = baseParamName + " Binary",
             defaultWeight = 1f,
             stateMachine = new UnityEditor.Animations.AnimatorStateMachine()
         };
+        */
 
-        animatorController.AddLayer(layer);
+        animatorController.AddLayer(baseParamName + " Binary");
 
-        var binaryLayer = animatorController.layers[animatorController.layers.Length - 1];
-
-        var rootStateMachine = binaryLayer.stateMachine;
+        var rootStateMachine = animatorController.layers[animatorController.layers.Length - 1].stateMachine;
         AnimatorState[] states = new AnimatorState[binarySize];
 
         // Creates a State with the user defined animations, then hooks it to the AnyState with transitions containing binary conditions, and user defined rules.
@@ -131,6 +131,7 @@ public class BinaryParameterScript
 
             states[i].motion = _blendTree;
         }
+
     }
 
     public static void CreateCombinedBinaryLayer(string baseParamName, AnimatorController animatorController, int binarySize, AnimationClip initClip, AnimationClip finalClip, AnimationClip finalNegativeClip, float min, float max, float minNeg, float maxNeg, float duration, bool nextStateInterrupt)
@@ -307,14 +308,14 @@ public class BinaryParameterScript
 
                 if (negativeCount == 1)
                 {
-                    _blendTree.AddChild(initClip, (min * 100f) - ((float)i / (float)binarySize) * 100f);
-                    _blendTree.AddChild(finalClip, (max * 100f) - ((float)i / (float)binarySize) * 100f);
+                    _blendTree.AddChild(initClip, (min * 100f) - ((float)i / (float)(binarySize - 1)) * 100f);
+                    _blendTree.AddChild(finalClip, (max * 100f) - ((float)i / (float)(binarySize - 1)) * 100f);
                 }
 
                 if (negativeCount == -1)
                 {
-                    _blendTree.AddChild(initClip, (minNeg * 100f) - ((float)i / (float)binarySize) * 100f);
-                    _blendTree.AddChild(finalNegativeClip, (maxNeg * 100f) - ((float)i / (float)binarySize) * 100f);
+                    _blendTree.AddChild(initClip, (minNeg * 100f) - ((float)i / (float)(binarySize - 1)) * 100f);
+                    _blendTree.AddChild(finalNegativeClip, (maxNeg * 100f) - ((float)i / (float)(binarySize - 1)) * 100f);
                 }
 
                 _blendTree.blendParameter = "BinaryBlend";
