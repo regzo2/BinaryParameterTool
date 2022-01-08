@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using UnityEditor.Animations;
 using System.Collections.Generic;
+using UnityEditor;
+using System;
 
 public class BinaryParameterScript
 {
@@ -114,6 +116,14 @@ public class BinaryParameterScript
                 blendType = BlendTreeType.Simple1D
             };
 
+            // Need this function to serialize the BlendTrees, otherwise they go byebye
+            AssetDatabase.StartAssetEditing();
+            if (AssetDatabase.GetAssetPath(rootStateMachine) != String.Empty)
+            {
+                AssetDatabase.AddObjectToAsset(_blendTree, AssetDatabase.GetAssetPath(rootStateMachine));
+            }
+            AssetDatabase.StopAssetEditing();
+
             _blendTree.blendParameter = "BinaryBlend";
             _blendTree.name = baseParamName + i;
             _blendTree.useAutomaticThresholds = false;
@@ -123,7 +133,6 @@ public class BinaryParameterScript
 
             states[i].motion = _blendTree;
         }
-
     }
 
     public static void CreateCombinedBinaryLayer(string baseParamName, AnimatorController animatorController, int binarySize, AnimationClip initClip, AnimationClip finalClip, AnimationClip finalNegativeClip, float min, float max, float minNeg, float maxNeg, float duration, bool nextStateInterrupt)
@@ -205,7 +214,6 @@ public class BinaryParameterScript
 
         while (negativeCount != 0)
         {
-
             if (negativeCount == 1)
             {
                 rootStateMachine.name = baseParamName + " Binary State Machine";
@@ -283,6 +291,14 @@ public class BinaryParameterScript
                 {
                     blendType = BlendTreeType.Simple1D
                 };
+
+                // Need this function to serialize the BlendTrees, otherwise they go byebye
+                AssetDatabase.StartAssetEditing();
+                if (AssetDatabase.GetAssetPath(rootStateMachine) != String.Empty)
+                {
+                    AssetDatabase.AddObjectToAsset(_blendTree, AssetDatabase.GetAssetPath(rootStateMachine));
+                }
+                AssetDatabase.StopAssetEditing();
 
                 _blendTree.blendParameter = "BinaryBlend";
                 _blendTree.name = baseParamName + (i * negativeCount);
