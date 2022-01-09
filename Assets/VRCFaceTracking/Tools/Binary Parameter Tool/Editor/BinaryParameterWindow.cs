@@ -50,174 +50,184 @@ public class BinaryParameterWindow : EditorWindow
             (
                 "Animator Controller",
                 "Animator Controller that will have the parameters, animations, transitions, states, and layer added to."
-            ), 
-            _animatorController, 
-            typeof(AnimatorController), 
-            true
-        );
-
-        EditorGUILayout.Space();
-        EditorGUILayout.LabelField("<size=12><color=white><b>Parameter Properties</b></color></size>", style);
-
-        _baseParamName = EditorGUILayout.TextField
-        (
-            new GUIContent
-            (
-                "Parameter", 
-                "The name of the parameter to be converted into a Binary parameter. " +
-                "These can be found on the VRCFaceTracking GitHub page. Make sure that " +
-                "when using the same parameter to use the same Binary Resolution, otherwise " +
-                "animations may have unintended behavior."
-            ), 
-            _baseParamName);
-
-        _selectionIndex = EditorGUILayout.Popup
-        (
-            new GUIContent
-            (   
-                "Binary Resolution",
-                "How many steps a Binary Parameter can make. Higher values are more accurate, " +
-                "while lower values are more economic for parameter space. Recommended to use a " +
-                "Resolution of 16 or less for more space savings."
             ),
-            _selectionIndex,
-            _binarySizeSelection);
-        _binarySize = int.Parse(_binarySizeSelection[_selectionIndex]
-        );
-
-        _isCombined = EditorGUILayout.Toggle
-        (
-            new GUIContent
-            (   
-                "Combined Parameter", 
-                "Does this parameter go from positive to negative?"
-            ), 
-            _isCombined
-        );
-
-        EditorGUILayout.Space();
-        EditorGUILayout.LabelField("<size=12><color=white><b>Animation Properties</b></color></size>", style);
-
-        _initClip = (AnimationClip)EditorGUILayout.ObjectField
-        (
-            new GUIContent
-            (
-                "Initial Clip",
-                "Animation Clip that represents when the parameter is at 0."
-            ),
-            _initClip, 
-            typeof(AnimationClip),
+            _animatorController,
+            typeof(AnimatorController),
             true
         );
 
-        _finalClip = (AnimationClip)EditorGUILayout.ObjectField
-        (
-            new GUIContent
-            (
-                "Final Clip",
-                "Animation Clip that represents when the parameter is at 1."
-            ), 
-            _finalClip, 
-            typeof(AnimationClip), 
-            true
-        );
-
-        // Min/Max threshold to use for adjusting animations to better fit faces (may become depricated if params get normalized properly on the face tracker)
-        EditorGUILayout.BeginHorizontal();
-        _min = EditorGUILayout.FloatField
-        (
-            new GUIContent
-            (
-                "Min/Max Anim Thresholds", 
-                "When should the animation start/end? Values other than (0,1) " +
-                "might not work as well or be as accurate on lower Binary Bit Resolutions"
-            ), 
-            _min
-        );
-
-        _max = EditorGUILayout.FloatField(_max);
-        EditorGUILayout.EndHorizontal();
-
-        if (_isCombined)
+        if (_animatorController != null)
         {
-            EditorGUILayout.Space();
+            if (_animatorController == null)
+                return;
 
-            _finalNegativeClip = (AnimationClip)EditorGUILayout.ObjectField
+            EditorGUILayout.Space();
+            EditorGUILayout.LabelField("<size=12><color=white><b>Parameter Properties</b></color></size>", style);
+
+            _baseParamName = EditorGUILayout.TextField
             (
                 new GUIContent
                 (
-                    "Final Negative Clip", 
-                    "Animation Clip that represents when the parameter is at -1. Make sure that it " +
-                    "animates the same properties as the Initial Clip!"
-                ), 
-                _finalNegativeClip, 
-                typeof(AnimationClip), 
+                    "Parameter",
+                    "The name of the parameter to be converted into a Binary parameter. " +
+                    "These can be found on the VRCFaceTracking GitHub page. Make sure that " +
+                    "when using the same parameter to use the same Binary Resolution, otherwise " +
+                    "animations may have unintended behavior."
+                ),
+                _baseParamName);
+
+            _selectionIndex = EditorGUILayout.Popup
+            (
+                new GUIContent
+                (
+                    "Binary Resolution",
+                    "How many steps a Binary Parameter can make. Higher values are more accurate, " +
+                    "while lower values are more economic for parameter space. Recommended to use a " +
+                    "Resolution of 16 or less for more space savings."
+                ),
+                _selectionIndex,
+                _binarySizeSelection
+            );
+
+            _binarySize = int.Parse(_binarySizeSelection[_selectionIndex]);
+
+            _isCombined = EditorGUILayout.Toggle
+            (
+                new GUIContent
+                (
+                    "Combined Parameter",
+                    "Does this parameter go from positive to negative? " +
+                    "This option will add an extra bool to keep track of the " +
+                    "positive/negative of the parameter, so keep that in mind when " +
+                    "evaluating how much parameter space it takes."
+                ),
+                _isCombined
+            );
+
+            EditorGUILayout.Space();
+            EditorGUILayout.LabelField("<size=12><color=white><b>Animation Properties</b></color></size>", style);
+
+            _initClip = (AnimationClip)EditorGUILayout.ObjectField
+            (
+                new GUIContent
+                (
+                    "Initial Clip",
+                    "Animation Clip that represents when the parameter is at 0."
+                ),
+                _initClip,
+                typeof(AnimationClip),
                 true
             );
 
-            EditorGUILayout.BeginHorizontal();
-            _minNeg = EditorGUILayout.FloatField
+            _finalClip = (AnimationClip)EditorGUILayout.ObjectField
             (
                 new GUIContent
                 (
-                    "Min/Max Anim Thresholds", 
-                    "When should the animation start/end? Values other than (0,1) " +
-                    "might not work as well or be as accurate on lower Binary Bit Resolutions"
-                ), 
-                _minNeg
+                    "Final Clip",
+                    "Animation Clip that represents when the parameter is at 1."
+                ),
+                _finalClip,
+                typeof(AnimationClip),
+                true
             );
 
-            _maxNeg = EditorGUILayout.FloatField(_maxNeg);
-            EditorGUILayout.EndHorizontal();
-        }
-
-        EditorGUILayout.Space();
-        _duration = EditorGUILayout.FloatField
-        (
-            new GUIContent
-            (
-                "Transition Duration", 
-                "How long does it take to transition to the active step? Lower values " +
-                "will be quicker but look more 'steppy', while higher values will look " +
-                "smoother but may feel 'sluggish' A good middle ground is 0.15 for 8 " +
-                "Resolution, more duration on less resolution and vice versa"
-            ), 
-            _duration
-        );
-
-        _nextStateInterrupt = EditorGUILayout.Toggle
-        (
-            new GUIContent
-            (
-                "Next State Interrupt", 
-                "Can the destination state interrupt the current transition? Very useful " +
-                "for parameters that need to register a maximum value before returning such as Blinking."
-            ), 
-            _nextStateInterrupt);
-
-        EditorGUILayout.Space();
-        if (!_isCombined)
-        {
-            if (GUILayout.Button
+            // Min/Max threshold to use for adjusting animations to better fit faces (may become depricated if params get normalized properly on the face tracker)
+            EditorGUILayout.BeginHorizontal();
+            _min = EditorGUILayout.FloatField
             (
                 new GUIContent
                 (
-                    "Create Binary Parameter Layer", 
-                    "Creates a new Layer in the selected Animator Controller as well as a set of states with " +
-                    "set animations, transitions, and parameters that handle the specified Binary Parameter."
-                )))
+                    "Min/Max Anim Thresholds",
+                    "When should the animation start/end? Values other than (0,1) " +
+                    "might not work as well or be as accurate on lower Binary Bit Resolutions"
+                ),
+                _min
+            );
+
+            _max = EditorGUILayout.FloatField(_max);
+            EditorGUILayout.EndHorizontal();
+
+            if (_isCombined)
             {
-                BinaryParameterScript.CreateBinaryLayer(_baseParamName, _animatorController, _binarySize, _initClip, _finalClip, _min, _max, _duration, _nextStateInterrupt);
+                EditorGUILayout.Space();
+
+                _finalNegativeClip = (AnimationClip)EditorGUILayout.ObjectField
+                (
+                    new GUIContent
+                    (
+                        "Final Negative Clip",
+                        "Animation Clip that represents when the parameter is at -1. Make sure that it " +
+                        "animates the same properties as the Initial Clip!"
+                    ),
+                    _finalNegativeClip,
+                    typeof(AnimationClip),
+                    true
+                );
+
+                EditorGUILayout.BeginHorizontal();
+                _minNeg = EditorGUILayout.FloatField
+                (
+                    new GUIContent
+                    (
+                        "Min/Max Anim Thresholds",
+                        "When should the animation start/end? Values other than (0,1) " +
+                        "might not work as well or be as accurate on lower Binary Bit Resolutions"
+                    ),
+                    _minNeg
+                );
+
+                _maxNeg = EditorGUILayout.FloatField(_maxNeg);
+                EditorGUILayout.EndHorizontal();
             }
-        }
-        else if (GUILayout.Button
-        (
-            new GUIContent
+
+            EditorGUILayout.Space();
+            _duration = EditorGUILayout.FloatField
             (
-                "Create Combined Binary Parameter Layer", 
-                "Creates a new Layer in the selected Animator Controller as well as a set of states with " +
-                "set animations, transitions, and parameters that handle the specified Combined Binary Parameter."
-            )))
-            BinaryParameterScript.CreateCombinedBinaryLayer(_baseParamName, _animatorController, _binarySize, _initClip, _finalClip, _finalNegativeClip, _min, _max, _minNeg, _maxNeg, _duration, _nextStateInterrupt);
+                new GUIContent
+                (
+                    "Transition Duration",
+                    "How long does it take to transition to the active step? Lower values " +
+                    "will be quicker but look more 'steppy', while higher values will look " +
+                    "smoother but may feel 'sluggish' A good middle ground is 0.15 for 8 " +
+                    "Resolution, more duration on less resolution and vice versa"
+                ),
+                _duration
+            );
+
+            _nextStateInterrupt = EditorGUILayout.Toggle
+            (
+                new GUIContent
+                (
+                    "Next State Interrupt",
+                    "Can the destination state interrupt the current transition? Very useful " +
+                    "for parameters that need to register a maximum value before returning such as Blinking."
+                ),
+                _nextStateInterrupt);
+
+            EditorGUILayout.Space();
+            if (!_isCombined)
+            {
+                if (GUILayout.Button
+                (
+                    new GUIContent
+                    (
+                        "Create Binary Parameter Layer",
+                        "Creates a new Layer in the selected Animator Controller as well as a set of states with " +
+                        "set animations, transitions, and parameters that handle the specified Binary Parameter."
+                    )))
+                {
+                    BinaryParameterScript.CreateBinaryLayer(_baseParamName, _animatorController, _binarySize, _initClip, _finalClip, _min, _max, _duration, _nextStateInterrupt);
+                }
+            }
+            else if (GUILayout.Button
+            (
+                new GUIContent
+                (
+                    "Create Combined Binary Parameter Layer",
+                    "Creates a new Layer in the selected Animator Controller as well as a set of states with " +
+                    "set animations, transitions, and parameters that handle the specified Combined Binary Parameter."
+                )))
+                BinaryParameterScript.CreateCombinedBinaryLayer(_baseParamName, _animatorController, _binarySize, _initClip, _finalClip, _finalNegativeClip, _min, _max, _minNeg, _maxNeg, _duration, _nextStateInterrupt);
+        }
     }
 }
