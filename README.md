@@ -1,5 +1,5 @@
 # Binary Parameter Tool
-### Simple tool that helps create Animation Layers that a Binary Parameter can interface with for the VRCFaceTracking Melonloader mod.
+### Simple Unity Editor tool that helps create Animation Layers that a Binary Parameter can interface with for the VRCFaceTracking Melonloader mod.
 
 ![binary parameter tool showcase](https://user-images.githubusercontent.com/74634856/148631235-9653f177-b818-4241-b13f-86892bfd6317.gif)
 
