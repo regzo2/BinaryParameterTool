@@ -211,18 +211,19 @@ public class BinaryParameterWindow : EditorWindow
                 _nextStateInterrupt
             );
 
-            _orderedInterrupt = EditorGUILayout.Toggle
-           (
-               new GUIContent
+            if (_nextStateInterrupt)
+                _orderedInterrupt = EditorGUILayout.Toggle
                (
-                   "Ordered Interrupt",
-                   "Does Next State Interrupt need to follow a set order on the Any State transition? " +
-                   "Very useful for things like blinking where it should be forced to go to a set state " +
-                   "(like closed lids) if a higher priority state is activated before returning to the true " +
-                   "active state."
-               ),
-               _orderedInterrupt
-           );
+                   new GUIContent
+                   (
+                       "Ordered Interrupt",
+                       "Does Next State Interrupt need to follow a set order on the Any State transition? " +
+                       "Very useful for things like blinking where it should be forced to go to a set state " +
+                       "(like closed lids) if a higher priority state is activated before returning to the true " +
+                       "active state."
+                   ),
+                   _orderedInterrupt
+               );
 
             _writeDefaults = EditorGUILayout.Toggle
             (
