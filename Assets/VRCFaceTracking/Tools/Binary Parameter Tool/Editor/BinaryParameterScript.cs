@@ -5,7 +5,7 @@ using UnityEditor;
 
 public class BinaryParameterScript
 {
-    public static void CreateBinaryLayer(string baseParamName, AnimatorController animatorController, int binarySize, AnimationClip initClip, AnimationClip finalClip, float min, float max, float duration, bool nextStateInterrupt, bool writeDefaults)
+    public static void CreateBinaryLayer(string baseParamName, AnimatorController animatorController, int binarySize, AnimationClip initClip, AnimationClip finalClip, float min, float max, float duration, bool nextStateInterrupt, bool writeDefaults, bool orderedInterrupt)
     {
         // Creating Parameters inside of the Animator Controller.
         CheckAndCreateBinaryParameters(baseParamName, animatorController, binarySize);
@@ -34,7 +34,7 @@ public class BinaryParameterScript
         var rootStateMachine = layer.stateMachine;
 
         // Creating a Binary State Machine
-        CreateBinaryStatesInMachine(baseParamName, binarySize, rootStateMachine, initClip, finalClip, writeDefaults, duration, nextStateInterrupt, min, max);
+        CreateBinaryStatesInMachine(baseParamName, binarySize, rootStateMachine, initClip, finalClip, writeDefaults, duration, nextStateInterrupt, orderedInterrupt, min, max);
     }
 
     public static void CreateCombinedBinaryLayer(string baseParamName, AnimatorController animatorController, int binarySize, AnimationClip initClip, AnimationClip finalClip, AnimationClip finalNegativeClip, float min, float max, float minNeg, float maxNeg, float duration, bool nextStateInterrupt, bool writeDefaults)
@@ -70,7 +70,7 @@ public class BinaryParameterScript
         var rootStateMachine = layer.stateMachine;
 
         // Creating a Combined Binary State Machine
-        CreateCombinedBinaryStatesInMachine(baseParamName, binarySize, rootStateMachine, initClip, finalClip, finalNegativeClip, writeDefaults, duration, nextStateInterrupt, min, max, minNeg, maxNeg);
+        CreateCombinedBinaryStatesInMachine(baseParamName, binarySize, rootStateMachine, initClip, finalClip, finalNegativeClip, writeDefaults, duration, nextStateInterrupt, orderedInterrupt, min, max, minNeg, maxNeg);
     }
 
     private static void CheckAndCreateParameter(string name, AnimatorController animatorController, int type)
@@ -128,7 +128,7 @@ public class BinaryParameterScript
         }
     }
 
-    private static void CreateCombinedBinaryStatesInMachine(string name, int binarySize, AnimatorStateMachine stateMachine, AnimationClip initClip, AnimationClip finalClip, AnimationClip finalNegativeClip, bool writeDefaults, float duration, bool nextStateInterrupt, float min, float max, float minNeg, float maxNeg)
+    private static void CreateCombinedBinaryStatesInMachine(string name, int binarySize, AnimatorStateMachine stateMachine, AnimationClip initClip, AnimationClip finalClip, AnimationClip finalNegativeClip, bool writeDefaults, float duration, bool nextStateInterrupt, bool orderedInterrupt, float min, float max, float minNeg, float maxNeg)
     {
         int negativeCount = 1;
 
@@ -168,7 +168,7 @@ public class BinaryParameterScript
             if (nextStateInterrupt)
             {
                 _basisAnyStateTransition.interruptionSource = TransitionInterruptionSource.Destination;
-                _basisAnyStateTransition.orderedInterruption = true;
+                _basisAnyStateTransition.orderedInterruption = orderedInterrupt;
             }
         }
 
@@ -204,7 +204,7 @@ public class BinaryParameterScript
                     if (nextStateInterrupt)
                     {
                         _anyStateTransition.interruptionSource = TransitionInterruptionSource.Destination;
-                        _anyStateTransition.orderedInterruption = true;
+                        _anyStateTransition.orderedInterruption = orderedInterrupt;
                     }
                 }
 
@@ -250,7 +250,7 @@ public class BinaryParameterScript
         }
     }
 
-    private static void CreateBinaryStatesInMachine(string name, int binarySize, AnimatorStateMachine stateMachine, AnimationClip initClip, AnimationClip finalClip, bool writeDefaults, float duration, bool nextStateInterrupt, float min, float max)
+    private static void CreateBinaryStatesInMachine(string name, int binarySize, AnimatorStateMachine stateMachine, AnimationClip initClip, AnimationClip finalClip, bool writeDefaults, float duration, bool nextStateInterrupt, bool orderedInterrupt, float min, float max)
     {
         int binarySteps = (int)Mathf.Pow(2, binarySize);
 
@@ -297,7 +297,7 @@ public class BinaryParameterScript
                 if (nextStateInterrupt)
                 {
                     _anyStateTransition.interruptionSource = TransitionInterruptionSource.Destination;
-                    _anyStateTransition.orderedInterruption = true;
+                    _anyStateTransition.orderedInterruption = orderedInterrupt;
                 }
             }
 
@@ -316,8 +316,8 @@ public class BinaryParameterScript
                 AssetDatabase.AddObjectToAsset(_blendTree, AssetDatabase.GetAssetPath(stateMachine));
             }
 
-            _blendTree.AddChild(initClip, minSteps + (int)((-1) * (i * (binarySteps) / (binarySteps - 1))));
-            _blendTree.AddChild(finalClip, maxSteps - i * (binarySteps) / (binarySteps - 1));
+            _blendTree.AddChild(initClip, minSteps + (int)((-1) * (i * (binarySteps) / (binarySteps))));
+            _blendTree.AddChild(finalClip, maxSteps - i * (binarySteps) / (binarySteps));
 
             states[i].motion = _blendTree;
             states[i].writeDefaultValues = writeDefaults;

@@ -11,8 +11,9 @@ public class BinaryParameterWindow : EditorWindow
     private AnimatorController _animatorController;
 
     private bool _isCombined = false;
-    private bool _nextStateInterrupt = false;
-    private bool _writeDefaults = true;
+    private bool _nextStateInterrupt = true;
+    private bool _writeDefaults = false;
+    private bool _orderedInterrupt = false;
 
     private float _min = 0f;
     private float _max = 1f;
@@ -142,8 +143,8 @@ public class BinaryParameterWindow : EditorWindow
                 new GUIContent
                 (
                     "Min/Max Anim Thresholds",
-                    "When should the animation start/end? Values other than (0,1) " +
-                    "might not work as well or be as accurate on lower Binary Bit Resolutions"
+                    "When should the animation start/end? Values will be adjusted to " +
+                    "fit within the size of the Binary Parameter."
                 ),
                 _min
             );
@@ -203,11 +204,25 @@ public class BinaryParameterWindow : EditorWindow
                 new GUIContent
                 (
                     "Next State Interrupt",
-                    "Can the destination state interrupt the current transition? Very useful " +
-                    "for parameters that need to register a maximum value before returning such as Blinking."
+                    "Can the destination state interrupt the current transition? Recommend" +
+                    "turning this value on to make the animations connect better with the active " +
+                    "parameter value."
                 ),
                 _nextStateInterrupt
             );
+
+            _orderedInterrupt = EditorGUILayout.Toggle
+           (
+               new GUIContent
+               (
+                   "Ordered Interrupt",
+                   "Does Next State Interrupt need to follow a set order on the Any State transition? " +
+                   "Very useful for things like blinking where it should be forced to go to a set state " +
+                   "(like closed lids) if a higher priority state is activated before returning to the true " +
+                   "active state."
+               ),
+               _orderedInterrupt
+           );
 
             _writeDefaults = EditorGUILayout.Toggle
             (
@@ -235,7 +250,7 @@ public class BinaryParameterWindow : EditorWindow
                         "set animations, transitions, and parameters that handle the specified Binary Parameter."
                     )))
                 {
-                    BinaryParameterScript.CreateBinaryLayer(_baseParamName, _animatorController, _binarySize, _initClip, _finalClip, _min, _max, _duration, _nextStateInterrupt, _writeDefaults);
+                    BinaryParameterScript.CreateBinaryLayer(_baseParamName, _animatorController, _binarySize, _initClip, _finalClip, _min, _max, _duration, _nextStateInterrupt, _writeDefaults, _orderedInterrupt);
                 }
             }
             else if (GUILayout.Button
@@ -246,7 +261,7 @@ public class BinaryParameterWindow : EditorWindow
                     "Creates a new Layer in the selected Animator Controller as well as a set of states with " +
                     "set animations, transitions, and parameters that handle the specified Combined Binary Parameter."
                 )))
-                BinaryParameterScript.CreateCombinedBinaryLayer(_baseParamName, _animatorController, _binarySize, _initClip, _finalClip, _finalNegativeClip, _min, _max, _minNeg, _maxNeg, _duration, _nextStateInterrupt, _writeDefaults);
+                BinaryParameterScript.CreateCombinedBinaryLayer(_baseParamName, _animatorController, _binarySize, _initClip, _finalClip, _finalNegativeClip, _min, _max, _minNeg, _maxNeg, _duration, _nextStateInterrupt, _writeDefaults, _orderedInterrupt);
 
             EditorGUILayout.HelpBox("Parameters To Add:" + GenerateParamNames(_baseParamName, _binarySize, _isCombined), MessageType.None);
         }
@@ -255,7 +270,6 @@ public class BinaryParameterWindow : EditorWindow
     private string GenerateParamNames(string name, int binarySize, bool isCombined)
     {
         string paramString = "";
-        string isCombinedString = isCombined ? (name + "Negative") : "";
 
         for (int i = 0; i < binarySize; i++)
         {
