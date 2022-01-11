@@ -12,6 +12,7 @@ public class BinaryParameterWindow : EditorWindow
 
     private bool _isCombined = false;
     private bool _nextStateInterrupt = false;
+    private bool _writeDefaults = true;
 
     private float _min = 0f;
     private float _max = 1f;
@@ -20,7 +21,7 @@ public class BinaryParameterWindow : EditorWindow
     private float _duration = 0.15f;
 
     private int _binarySize;
-    private int _selectionIndex = 2;
+    private int _binarySizeTemp;
 
     private string _baseParamName;
 
@@ -76,7 +77,7 @@ public class BinaryParameterWindow : EditorWindow
                 ),
                 _baseParamName);
 
-            _selectionIndex = EditorGUILayout.Popup
+            _binarySizeTemp = EditorGUILayout.Popup
             (
                 new GUIContent
                 (
@@ -85,11 +86,11 @@ public class BinaryParameterWindow : EditorWindow
                     "while lower values are more economic for parameter space. Recommended to use a " +
                     "Resolution of 16 or less for more space savings."
                 ),
-                _selectionIndex,
+                _binarySizeTemp,
                 _binarySizeSelection
             );
 
-            _binarySize = int.Parse(_binarySizeSelection[_selectionIndex]);
+            _binarySize  = _binarySizeTemp + 1;
 
             _isCombined = EditorGUILayout.Toggle
             (
@@ -98,11 +99,14 @@ public class BinaryParameterWindow : EditorWindow
                     "Combined Parameter",
                     "Does this parameter go from positive to negative? " +
                     "This option will add an extra bool to keep track of the " +
-                    "positive/negative of the parameter, so keep that in mind when " +
-                    "evaluating how much parameter space it takes."
+                    "positive/negative of the parameter."
                 ),
                 _isCombined
             );
+
+            int _memoryUsage = (_binarySize + (_isCombined ? 1 : 0));
+
+            EditorGUILayout.HelpBox("Parameter Memory Usage: " + (_memoryUsage).ToString() + " bit" + (_memoryUsage > 1 ? "s" : ""), MessageType.Info, true);
 
             EditorGUILayout.Space();
             EditorGUILayout.LabelField("<size=12><color=white><b>Animation Properties</b></color></size>", style);
@@ -202,7 +206,22 @@ public class BinaryParameterWindow : EditorWindow
                     "Can the destination state interrupt the current transition? Very useful " +
                     "for parameters that need to register a maximum value before returning such as Blinking."
                 ),
-                _nextStateInterrupt);
+                _nextStateInterrupt
+            );
+
+            _writeDefaults = EditorGUILayout.Toggle
+            (
+                new GUIContent
+                (
+                    "Write Defaults",
+                    "Can the Animations on this layer set unbound Animation Properties to their default " +
+                    "values? Recommended to keep this off to avoid blendshape animation conflicts. WARNING: " +
+                    "You will run into issues if you have Write Defaults enabled and disabled on different " +
+                    "animations, use a tool like AV3Manager to set Write Defaults to a universal enable/disable."
+
+                ),
+                _writeDefaults
+            );
 
             EditorGUILayout.Space();
             if (!_isCombined)
@@ -216,7 +235,7 @@ public class BinaryParameterWindow : EditorWindow
                         "set animations, transitions, and parameters that handle the specified Binary Parameter."
                     )))
                 {
-                    BinaryParameterScript.CreateBinaryLayer(_baseParamName, _animatorController, _binarySize, _initClip, _finalClip, _min, _max, _duration, _nextStateInterrupt);
+                    BinaryParameterScript.CreateBinaryLayer(_baseParamName, _animatorController, _binarySize, _initClip, _finalClip, _min, _max, _duration, _nextStateInterrupt, _writeDefaults);
                 }
             }
             else if (GUILayout.Button
@@ -227,7 +246,24 @@ public class BinaryParameterWindow : EditorWindow
                     "Creates a new Layer in the selected Animator Controller as well as a set of states with " +
                     "set animations, transitions, and parameters that handle the specified Combined Binary Parameter."
                 )))
-                BinaryParameterScript.CreateCombinedBinaryLayer(_baseParamName, _animatorController, _binarySize, _initClip, _finalClip, _finalNegativeClip, _min, _max, _minNeg, _maxNeg, _duration, _nextStateInterrupt);
+                BinaryParameterScript.CreateCombinedBinaryLayer(_baseParamName, _animatorController, _binarySize, _initClip, _finalClip, _finalNegativeClip, _min, _max, _minNeg, _maxNeg, _duration, _nextStateInterrupt, _writeDefaults);
+
+            EditorGUILayout.HelpBox("Parameters To Add:" + GenerateParamNames(_baseParamName, _binarySize, _isCombined), MessageType.None);
         }
+    }
+
+    private string GenerateParamNames(string name, int binarySize, bool isCombined)
+    {
+        string paramString = "";
+        string isCombinedString = isCombined ? (name + "Negative") : "";
+
+        for (int i = 0; i < binarySize; i++)
+        {
+            paramString += "\n" + name + Mathf.Pow(2, i);
+        }
+
+        paramString += isCombined ? "\n" + name + "Negative" : "";
+
+        return paramString;
     }
 }
