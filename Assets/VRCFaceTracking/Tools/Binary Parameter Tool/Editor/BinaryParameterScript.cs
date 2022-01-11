@@ -37,7 +37,7 @@ public class BinaryParameterScript
         CreateBinaryStatesInMachine(baseParamName, binarySize, rootStateMachine, initClip, finalClip, writeDefaults, duration, nextStateInterrupt, orderedInterrupt, min, max);
     }
 
-    public static void CreateCombinedBinaryLayer(string baseParamName, AnimatorController animatorController, int binarySize, AnimationClip initClip, AnimationClip finalClip, AnimationClip finalNegativeClip, float min, float max, float minNeg, float maxNeg, float duration, bool nextStateInterrupt, bool writeDefaults)
+    public static void CreateCombinedBinaryLayer(string baseParamName, AnimatorController animatorController, int binarySize, AnimationClip initClip, AnimationClip finalClip, AnimationClip finalNegativeClip, float min, float max, float minNeg, float maxNeg, float duration, bool nextStateInterrupt, bool orderedInterrupt, bool writeDefaults)
     {
         // Creating Parameters inside of the Animator Controller. Will be using a list to keep track of the tracking params for later.
         CheckAndCreateBinaryParameters(baseParamName, animatorController, binarySize);
