@@ -13,7 +13,6 @@ public class BinaryParameterWindow : EditorWindow
     private bool _isCombined = false;
     private bool _nextStateInterrupt = true;
     private bool _writeDefaults = false;
-    private bool _orderedInterrupt = false;
 
     private float _min = 0f;
     private float _max = 1f;
@@ -211,20 +210,6 @@ public class BinaryParameterWindow : EditorWindow
                 _nextStateInterrupt
             );
 
-            if (_nextStateInterrupt)
-                _orderedInterrupt = EditorGUILayout.Toggle
-               (
-                   new GUIContent
-                   (
-                       "Ordered Interrupt",
-                       "Does Next State Interrupt need to follow a set order on the Any State transition? " +
-                       "Very useful for things like blinking where it should be forced to go to a set state " +
-                       "(like closed lids) if a higher priority state is activated before returning to the true " +
-                       "active state."
-                   ),
-                   _orderedInterrupt
-               );
-
             _writeDefaults = EditorGUILayout.Toggle
             (
                 new GUIContent
@@ -251,7 +236,7 @@ public class BinaryParameterWindow : EditorWindow
                         "set animations, transitions, and parameters that handle the specified Binary Parameter."
                     )))
                 {
-                    BinaryParameterScript.CreateBinaryLayer(_baseParamName, _animatorController, _binarySize, _initClip, _finalClip, _min, _max, _duration, _nextStateInterrupt, _writeDefaults, _orderedInterrupt);
+                    BinaryParameterScript.CreateBinaryLayer(_baseParamName, _animatorController, _binarySize, _initClip, _finalClip, _min, _max, _duration, _nextStateInterrupt, _writeDefaults);
                 }
             }
             else if (GUILayout.Button
@@ -262,7 +247,7 @@ public class BinaryParameterWindow : EditorWindow
                     "Creates a new Layer in the selected Animator Controller as well as a set of states with " +
                     "set animations, transitions, and parameters that handle the specified Combined Binary Parameter."
                 )))
-                BinaryParameterScript.CreateCombinedBinaryLayer(_baseParamName, _animatorController, _binarySize, _initClip, _finalClip, _finalNegativeClip, _min, _max, _minNeg, _maxNeg, _duration, _nextStateInterrupt, _orderedInterrupt, _writeDefaults);
+                BinaryParameterScript.CreateCombinedBinaryLayer(_baseParamName, _animatorController, _binarySize, _initClip, _finalClip, _finalNegativeClip, _min, _max, _minNeg, _maxNeg, _duration, _nextStateInterrupt, _writeDefaults);
 
             EditorGUILayout.HelpBox("Parameters To Add:" + GenerateParamNames(_baseParamName, _binarySize, _isCombined), MessageType.None);
         }
