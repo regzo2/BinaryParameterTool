@@ -18,7 +18,7 @@ public class BinaryParameterWindow : EditorWindow
     private float _max = 1f;
     private float _minNeg = 0f;
     private float _maxNeg = 1f;
-    private float _duration = 0.15f;
+    private float _duration = 0.1f;
 
     private int _binarySize;
     private int _binarySizeTemp;
@@ -192,7 +192,7 @@ public class BinaryParameterWindow : EditorWindow
                     "Transition Duration",
                     "How long does it take to transition to the active step? Lower values " +
                     "will be quicker but look more 'steppy', while higher values will look " +
-                    "smoother but may feel 'sluggish' A good middle ground is 0.15 for 8 " +
+                    "smoother but may feel 'sluggish' A good middle ground is 0.1 for 8 " +
                     "Resolution, more duration on less resolution and vice versa"
                 ),
                 _duration
@@ -203,9 +203,9 @@ public class BinaryParameterWindow : EditorWindow
                 new GUIContent
                 (
                     "Next State Interrupt",
-                    "Can the destination state interrupt the current transition? Recommend " +
-                    "turning this value on to make the animations connect better with the active " +
-                    "parameter value."
+                    "Cant the next state interrupt the current transition? Very " +
+                    "useful in making the animation states better connect with " +
+                    "the current parameter value (less delay)."
                 ),
                 _nextStateInterrupt
             );
