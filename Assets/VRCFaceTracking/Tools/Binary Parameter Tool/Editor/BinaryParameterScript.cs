@@ -170,9 +170,12 @@ public class BinaryParameterScript
                 _basisAnyStateTransition.interruptionSource = TransitionInterruptionSource.Destination;
                 _basisAnyStateTransition.orderedInterruption = orderedInterrupt;
             }
+
+
         }
 
         basisState.motion = initClip;
+        basisState.writeDefaultValues = writeDefaults;
 
         while (negativeCount != 0)
         {

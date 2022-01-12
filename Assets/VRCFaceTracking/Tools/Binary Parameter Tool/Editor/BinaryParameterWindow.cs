@@ -251,7 +251,7 @@ public class BinaryParameterWindow : EditorWindow
                         "set animations, transitions, and parameters that handle the specified Binary Parameter."
                     )))
                 {
-                    BinaryParameterScript.CreateBinaryLayer(_baseParamName, _animatorController, _binarySize, _initClip, _finalClip, _min, _max, _duration, _nextStateInterrupt, _orderedInterrupt, _writeDefaults);
+                    BinaryParameterScript.CreateBinaryLayer(_baseParamName, _animatorController, _binarySize, _initClip, _finalClip, _min, _max, _duration, _nextStateInterrupt, _writeDefaults, _orderedInterrupt);
                 }
             }
             else if (GUILayout.Button
