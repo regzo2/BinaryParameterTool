@@ -161,7 +161,7 @@ public class BinaryParameterScript
 
         for (int j = 0; j < binarySize; j++)
         {
-            _basisAnyStateTransition.AddCondition(AnimatorConditionMode.IfNot, 0, name + binarySteps);
+            _basisAnyStateTransition.AddCondition(AnimatorConditionMode.IfNot, 0, name + Mathf.Pow(2, j));
 
             _basisAnyStateTransition.duration = duration;
             _basisAnyStateTransition.canTransitionToSelf = false;
@@ -191,9 +191,6 @@ public class BinaryParameterScript
                 for (int j = 0; j < binarySize; j++)
                 {
                     int _conditionSetTrue = (i >> j) & 1;
-
-                    if (i == binarySize)
-                        _conditionSetTrue = 1;
 
                     if (_conditionSetTrue == 1)
                         _anyStateTransition.AddCondition(AnimatorConditionMode.If, 0, name + Mathf.Pow(2, j));
@@ -284,9 +281,6 @@ public class BinaryParameterScript
             for (int j = 0; j < binarySize; j++)
             {
                 int _conditionSetTrue = (i >> j) & 1;
-
-                if (i == binarySize)
-                    _conditionSetTrue = 1;
 
                 if (_conditionSetTrue == 1)
                     _anyStateTransition.AddCondition(AnimatorConditionMode.If, 0, name + Mathf.Pow(2, j));
