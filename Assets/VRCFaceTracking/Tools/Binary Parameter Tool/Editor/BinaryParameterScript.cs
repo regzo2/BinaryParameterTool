@@ -1,7 +1,6 @@
-﻿    using UnityEngine;
-    using UnityEditor.Animations;
-    using System.Collections.Generic;
-    using UnityEditor;
+﻿using UnityEngine;
+using UnityEditor.Animations;
+using UnityEditor;
 
 namespace VRCFaceTracking.EditorTools
 {
@@ -46,7 +45,6 @@ namespace VRCFaceTracking.EditorTools
             duration = 0.1f;
 
             nextStateInterrupt = true;
-
             writeDefaults = true;
     }
 
@@ -56,7 +54,7 @@ namespace VRCFaceTracking.EditorTools
             CheckAndCreateBinaryParameters(baseParamName, animatorController, binarySize);
 
             // Create BinaryBlend parameter if it does not exist. Unity shenanaginsssss.
-            CheckAndCreateParameter("BinaryBlend", animatorController, 1);
+            ParameterTools.CheckAndCreateParameter("BinaryBlend", animatorController, 1);
             // Creating a layer object since the default weight can not be assigned after creation.
             AnimatorControllerLayer layer = new AnimatorControllerLayer
             {
@@ -88,10 +86,10 @@ namespace VRCFaceTracking.EditorTools
             CheckAndCreateBinaryParameters(baseParamName, animatorController, binarySize);
 
             // Create BinaryBlend parameter if it does not exist. Unity shenanaginsssss.
-            CheckAndCreateParameter("BinaryBlend", animatorController, 1);
+            ParameterTools.CheckAndCreateParameter("BinaryBlend", animatorController, 1);
 
             // Create ...Negative parameter if it does not exist.
-            CheckAndCreateParameter(baseParamName + "Negative", animatorController, 4);
+            ParameterTools.CheckAndCreateParameter(baseParamName + "Negative", animatorController, 4);
 
             // Creating a layer object since the default weight can not be assigned after creation.
             AnimatorControllerLayer layer = new AnimatorControllerLayer
@@ -118,25 +116,6 @@ namespace VRCFaceTracking.EditorTools
             CreateCombinedBinaryStatesInMachine(baseParamName, binarySize, rootStateMachine, initClip, finalClip, finalNegativeClip, writeDefaults, duration, nextStateInterrupt, min, max, minNeg, maxNeg);
         }
 
-        private static void CheckAndCreateParameter(string name, AnimatorController animatorController, int type)
-        {
-            AnimatorControllerParameterType _typeEnum = (AnimatorControllerParameterType)type;
-
-            if (animatorController.parameters.Length == 0)
-                animatorController.AddParameter(name, _typeEnum);
-
-            for (int j = 0; j <= animatorController.parameters.Length - 1; j++)
-            {
-
-                if (animatorController.parameters[j].name == name)
-                {
-                    break;
-                }
-
-                if (animatorController.parameters.Length - 1 == j)
-                    animatorController.AddParameter(name, _typeEnum);
-            }
-        }
 
         private static void CheckAndCreateBinaryParameters(string name, AnimatorController animatorController, int binarySize)
         {

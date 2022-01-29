@@ -16,7 +16,7 @@ namespace VRCFaceTracking.EditorTools
 
         private bool _isCombined = false;
         private bool _nextStateInterrupt = true;
-        private bool _writeDefaults = false;
+        private bool _writeDefaults = true;
 
         private float _min = 0f;
         private float _max = 1f;
@@ -26,6 +26,7 @@ namespace VRCFaceTracking.EditorTools
 
         private int _binarySize;
         private int _binarySizeTemp;
+        private int _tab;
 
         private string _baseParamName;
 
@@ -51,7 +52,7 @@ namespace VRCFaceTracking.EditorTools
 
             EditorGUILayout.LabelField("<size=12><color=white><b>Avatar Properties</b></color></size>", style);
 
-            _animatorController = (AnimatorController)EditorGUILayout.ObjectField
+        _animatorController = (AnimatorController)EditorGUILayout.ObjectField
             (
                 new GUIContent
                 (
@@ -125,91 +126,131 @@ namespace VRCFaceTracking.EditorTools
                 EditorGUILayout.Space();
                 EditorGUILayout.LabelField("<size=12><color=white><b>Animation Properties</b></color></size>", style);
 
-                _initClip = (AnimationClip)EditorGUILayout.ObjectField
-                (
-                    new GUIContent
-                    (
-                        "Initial Clip",
-                        "Animation Clip that represents when the parameter is at 0."
-                    ),
-                    _initClip,
-                    typeof(AnimationClip),
-                    true
-                );
+                _tab = GUILayout.Toolbar(_tab,
+                    new GUIContent[]
+                    {
+                        new GUIContent
+                        (
+                            "Float Parameter",
+                            "This Binary State Machine will drive the Float " +
+                            "parameter listed in the 'Parameter' field above " +
+                            "using Binary parameters. Useful for converting " +
+                            "existing animations that are using floats."
+                        ),
+                        new GUIContent
+                        (
+                            "Direct Animation",
+                            "This mode creates a Binary State Machine that directly drives " +
+                            "any animations added to the Animation fields below " +
+                            "using Binary parameters."
+                        )
+                    });
 
-                _binaryStateMachine.initClip = _initClip;
-
-                _finalClip = (AnimationClip)EditorGUILayout.ObjectField
-                (
-                    new GUIContent
-                    (
-                        "Final Clip",
-                        "Animation Clip that represents when the parameter is at 1."
-                    ),
-                    _finalClip,
-                    typeof(AnimationClip),
-                    true
-                );
-
-                _binaryStateMachine.finalClip = _finalClip;
-
-                // Min/Max threshold to use for adjusting animations to better fit faces (may become depricated if params get normalized properly on the face tracker)
-                EditorGUILayout.BeginHorizontal();
-                _min = EditorGUILayout.FloatField
-                (
-                    new GUIContent
-                    (
-                        "Min/Max Anim Thresholds",
-                        "When should the animation start/end? Values will be adjusted to " +
-                        "fit within the size of the Binary Parameter."
-                    ),
-                    _min
-                );
-
-                _binaryStateMachine.min = _min;
-
-                _max = EditorGUILayout.FloatField(_max);
-                EditorGUILayout.EndHorizontal();
-
-                _binaryStateMachine.max = _max;
-
-                if (_isCombined)
+                if (_tab == 1)
                 {
-                    EditorGUILayout.Space();
-
-                    _finalNegativeClip = (AnimationClip)EditorGUILayout.ObjectField
+                    _initClip = (AnimationClip)EditorGUILayout.ObjectField
                     (
                         new GUIContent
                         (
-                            "Final Negative Clip",
-                            "Animation Clip that represents when the parameter is at -1. Make sure that it " +
-                            "animates the same properties as the Initial Clip!"
+                            "Initial Clip",
+                            "Animation Clip that represents when the parameter is at 0."
                         ),
-                        _finalNegativeClip,
+                        _initClip,
                         typeof(AnimationClip),
                         true
                     );
 
-                    _binaryStateMachine.finalNegativeClip = _finalNegativeClip;
+                    _binaryStateMachine.initClip = _initClip;
 
+                    _finalClip = (AnimationClip)EditorGUILayout.ObjectField
+                    (
+                        new GUIContent
+                        (
+                            "Final Clip",
+                            "Animation Clip that represents when the parameter is at 1."
+                        ),
+                        _finalClip,
+                        typeof(AnimationClip),
+                        true
+                    );
+
+                    _binaryStateMachine.finalClip = _finalClip;
+
+                    // Min/Max threshold to use for adjusting animations to better fit faces (may become depricated if params get normalized properly on the face tracker)
                     EditorGUILayout.BeginHorizontal();
-                    _minNeg = EditorGUILayout.FloatField
+                    _min = EditorGUILayout.FloatField
                     (
                         new GUIContent
                         (
                             "Min/Max Anim Thresholds",
-                            "When should the animation start/end? Values other than (0,1) " +
-                            "might not work as well or be as accurate on lower Binary Bit Resolutions"
+                            "When should the animation start/end? Values will be adjusted to " +
+                            "fit within the size of the Binary Parameter."
                         ),
-                        _minNeg
+                        _min
                     );
 
-                    _binaryStateMachine.minNeg = _minNeg;
+                    _binaryStateMachine.min = _min;
 
-                    _maxNeg = EditorGUILayout.FloatField(_maxNeg);
+                    _max = EditorGUILayout.FloatField(_max);
                     EditorGUILayout.EndHorizontal();
 
-                    _binaryStateMachine.maxNeg = _maxNeg;
+                    _binaryStateMachine.max = _max;
+
+                    if (_isCombined)
+                    {
+                        EditorGUILayout.Space();
+
+                        _finalNegativeClip = (AnimationClip)EditorGUILayout.ObjectField
+                        (
+                            new GUIContent
+                            (
+                                "Final Negative Clip",
+                                "Animation Clip that represents when the parameter is at -1. Make sure that it " +
+                                "animates the same properties as the Initial Clip!"
+                            ),
+                            _finalNegativeClip,
+                            typeof(AnimationClip),
+                            true
+                        );
+
+                        _binaryStateMachine.finalNegativeClip = _finalNegativeClip;
+
+                        EditorGUILayout.BeginHorizontal();
+                        _minNeg = EditorGUILayout.FloatField
+                        (
+                            new GUIContent
+                            (
+                                "Min/Max Anim Thresholds",
+                                "When should the animation start/end? Values other than (0,1) " +
+                                "might not work as well or be as accurate on lower Binary Bit Resolutions"
+                            ),
+                            _minNeg
+                        );
+
+                        _binaryStateMachine.minNeg = _minNeg;
+
+                        _maxNeg = EditorGUILayout.FloatField(_maxNeg);
+                        EditorGUILayout.EndHorizontal();
+
+                        _binaryStateMachine.maxNeg = _maxNeg;
+                    }
+                }
+
+                if (_tab == 0)
+                {
+                    _binaryStateMachine.min = 0f;
+
+                    _binaryStateMachine.max = 1f;
+
+                    if (_isCombined)
+                    {
+
+                        _binaryStateMachine.finalNegativeClip = _finalNegativeClip;
+
+                        _binaryStateMachine.minNeg = 0f;
+
+                        _binaryStateMachine.maxNeg = 1f;
+                    }
                 }
 
                 EditorGUILayout.Space();
@@ -270,6 +311,13 @@ namespace VRCFaceTracking.EditorTools
                             "set animations, transitions, and parameters that handle the specified Binary Parameter."
                         )))
                     {
+                        if (_tab == 0)
+                        {
+                            ParameterTools.CheckAndCreateParameter(_baseParamName, _animatorController, 1);
+
+                            _binaryStateMachine.initClip = BinaryParameterFloatDriver.CreateFloatDriverAnimation(_baseParamName, 0f);
+                            _binaryStateMachine.finalClip = BinaryParameterFloatDriver.CreateFloatDriverAnimation(_baseParamName, 1f);
+                        }
                         _binaryStateMachine.CreateBinaryLayer();
                     }
                 }
@@ -281,7 +329,17 @@ namespace VRCFaceTracking.EditorTools
                         "Creates a new Layer in the selected Animator Controller as well as a set of states with " +
                         "set animations, transitions, and parameters that handle the specified Combined Binary Parameter."
                     )))
+                {
+                    if (_tab == 0)
+                    {
+                        ParameterTools.CheckAndCreateParameter(_baseParamName, _animatorController, 1);
+
+                        _binaryStateMachine.initClip = BinaryParameterFloatDriver.CreateFloatDriverAnimation(_baseParamName, 0f);
+                        _binaryStateMachine.finalClip = BinaryParameterFloatDriver.CreateFloatDriverAnimation(_baseParamName, 1f);
+                        _binaryStateMachine.finalNegativeClip = BinaryParameterFloatDriver.CreateFloatDriverAnimation(_baseParamName, -1f);
+                    }
                     _binaryStateMachine.CreateCombinedBinaryLayer();
+                }
 
                 EditorGUILayout.HelpBox("Parameters To Add:" + GenerateParamNames(_baseParamName, _binarySize, _isCombined), MessageType.None);
             }
