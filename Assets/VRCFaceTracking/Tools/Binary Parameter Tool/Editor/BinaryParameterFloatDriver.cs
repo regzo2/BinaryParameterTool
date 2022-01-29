@@ -22,8 +22,18 @@ namespace VRCFaceTracking.EditorTools
                 Directory.CreateDirectory("Assets/VRCFaceTracking/Generated/Anims/");
             }
 
-            AssetDatabase.CreateAsset(_animationClip, "Assets/VRCFaceTracking/Generated/Anims/" + baseParamName + parameterValue + "Float.anim");
-            AssetDatabase.SaveAssets();
+            string[] guid = (AssetDatabase.FindAssets(baseParamName + parameterValue + "Float"));
+
+            if (guid.Length == 0)
+            {
+                AssetDatabase.CreateAsset(_animationClip, "Assets/VRCFaceTracking/Generated/Anims/" + baseParamName + parameterValue + "Float.anim");
+                AssetDatabase.SaveAssets();
+            }
+
+            else
+            {
+                _animationClip = (AnimationClip)AssetDatabase.LoadAssetAtPath(AssetDatabase.GUIDToAssetPath(guid[0]), typeof(AnimationClip));
+            }
 
             return _animationClip;
         }
