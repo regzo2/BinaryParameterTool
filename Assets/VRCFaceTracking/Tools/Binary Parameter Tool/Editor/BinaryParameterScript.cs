@@ -38,10 +38,10 @@ namespace VRCFaceTracking.EditorTools
 
             binarySize = 4;
 
-            min = 1f;
-            max = 0f;
-            minNeg = 1f;
-            maxNeg = 0f;
+            min = 0f;
+            max = 1f;
+            minNeg = 0f;
+            maxNeg = 1f;
             duration = 0.1f;
 
             nextStateInterrupt = true;
