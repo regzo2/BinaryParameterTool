@@ -55,6 +55,7 @@ namespace VRCFaceTracking.EditorTools
 
             // Create BinaryBlend parameter if it does not exist. Unity shenanaginsssss.
             ParameterTools.CheckAndCreateParameter("BinaryBlend", animatorController, 1);
+
             // Creating a layer object since the default weight can not be assigned after creation.
             AnimatorControllerLayer layer = new AnimatorControllerLayer
             {
@@ -344,5 +345,79 @@ namespace VRCFaceTracking.EditorTools
                 states[i].writeDefaultValues = writeDefaults;
             }
         }
+
+        public void CreateSmoothingLayer(float smoothness)
+        {
+            AnimatorControllerParameter smootherParam = ParameterTools.CheckAndCreateParameter(baseParamName + "Smoother", animatorController, 1, 0.8);
+            ParameterTools.CheckAndCreateParameter(baseParamName + "Proxy", animatorController, 1);
+            ParameterTools.CheckAndCreateParameter(baseParamName, animatorController, 1);
+
+            // Creates an animation layer
+            AnimatorControllerLayer layer = new AnimatorControllerLayer
+            {
+                name = baseParamName + " Float Smoother",
+                stateMachine = new AnimatorStateMachine
+                {
+                    hideFlags = HideFlags.HideInHierarchy
+                },
+                defaultWeight = 1f
+            };
+
+            // Store Layer into Animator Controller, as creating a Layer object is not serialized unless we store it inside an asset.
+            if (AssetDatabase.GetAssetPath(animatorController) != string.Empty)
+            {
+                AssetDatabase.AddObjectToAsset(layer.stateMachine, AssetDatabase.GetAssetPath(animatorController));
+            }
+
+            //Adds the Layer asset to the animator controller
+            animatorController.AddLayer(layer);
+
+            // Creating 3 blend trees to create the feedback loop
+            BlendTree rootTree = new BlendTree
+            {
+                blendType = BlendTreeType.Simple1D,
+                hideFlags = HideFlags.HideInHierarchy,
+                blendParameter = baseParamName + "Smoother",
+                name = "Root",
+                useAutomaticThresholds = false
+            };
+            BlendTree falseTree = new BlendTree
+            {
+                blendType = BlendTreeType.Simple1D,
+                hideFlags = HideFlags.HideInHierarchy,
+                blendParameter = baseParamName + "Proxy",
+                name = "ProxyBlend",
+                useAutomaticThresholds = false
+            }; ; 
+            BlendTree trueTree = new BlendTree
+            {
+                blendType = BlendTreeType.Simple1D,
+                hideFlags = HideFlags.HideInHierarchy,
+                blendParameter = baseParamName,
+                name = "TrueBlend",
+                useAutomaticThresholds = false
+            }; ;
+
+            // Create smoothing anims
+            AnimationClip[] driverAnims = BinaryParameterFloatDriver.CreateFloatSmootherAnimation(baseParamName, -1f);
+
+            rootTree.AddChild(falseTree, 0);
+            rootTree.AddChild(trueTree, 1);
+
+            falseTree.AddChild(driverAnims[0], -1);
+            falseTree.AddChild(driverAnims[1], 1);
+
+            trueTree.AddChild(driverAnims[0], -1);
+            trueTree.AddChild(driverAnims[1], 1);
+
+            AssetDatabase.AddObjectToAsset(rootTree, AssetDatabase.GetAssetPath(layer.stateMachine));
+            AssetDatabase.AddObjectToAsset(falseTree, AssetDatabase.GetAssetPath(layer.stateMachine));
+            AssetDatabase.AddObjectToAsset(trueTree, AssetDatabase.GetAssetPath(layer.stateMachine));
+
+            AnimatorState state = layer.stateMachine.AddState("Smoother");
+
+            state.motion = rootTree;
+        }
+
     }
 }
