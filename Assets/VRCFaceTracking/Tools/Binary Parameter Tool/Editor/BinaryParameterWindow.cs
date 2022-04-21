@@ -28,7 +28,7 @@ namespace VRCFaceTracking.EditorTools
         private float _max = 1f;
         private float _minNeg = 0f;
         private float _maxNeg = 1f;
-        private float _duration = 0.1f;
+        private float _duration = 0f;
         private float _smoothness = 0.9f;
 
         private int _binarySize;
