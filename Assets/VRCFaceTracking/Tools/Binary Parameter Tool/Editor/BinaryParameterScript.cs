@@ -363,7 +363,7 @@ namespace VRCFaceTracking.EditorTools
 
         public void CreateSmoothingLayer(float smoothness)
         {
-            AnimatorControllerParameter smootherParam = ParameterTools.CheckAndCreateParameter(baseParamName + "Smoother", animatorController, 1, 0.8);
+            AnimatorControllerParameter smootherParam = ParameterTools.CheckAndCreateParameter(baseParamName + "Smoother", animatorController, 1, smoothness);
             ParameterTools.CheckAndCreateParameter(baseParamName + "Proxy", animatorController, 1);
             ParameterTools.CheckAndCreateParameter(baseParamName, animatorController, 1);
 
