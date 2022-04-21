@@ -50,11 +50,19 @@ namespace VRCFaceTracking.EditorTools
 
         public void CreateBinaryLayer()
         {
+            
             // Creating Parameters inside of the Animator Controller.
             CheckAndCreateBinaryParameters(baseParamName, animatorController, binarySize);
 
             // Create BinaryBlend parameter if it does not exist. Unity shenanaginsssss.
             ParameterTools.CheckAndCreateParameter("BinaryBlend", animatorController, 1);
+
+            // Clear out existing ...Binary layers to make-way for an updated one
+            for (int i = 0; i < animatorController.layers.Length; i++)
+                if (animatorController.layers[i].name == baseParamName + " Binary")
+                {
+                    animatorController.RemoveLayer(i);
+                }
 
             // Creating a layer object since the default weight can not be assigned after creation.
             AnimatorControllerLayer layer = new AnimatorControllerLayer
@@ -91,6 +99,13 @@ namespace VRCFaceTracking.EditorTools
 
             // Create ...Negative parameter if it does not exist.
             ParameterTools.CheckAndCreateParameter(baseParamName + "Negative", animatorController, 4);
+
+            // Clear out existing ...Binary layers to make-way for an updated one
+            for (int i = 0; i < animatorController.layers.Length; i++)
+                if (animatorController.layers[i].name == baseParamName + " Binary")
+                {
+                    animatorController.RemoveLayer(i);
+                }
 
             // Creating a layer object since the default weight can not be assigned after creation.
             AnimatorControllerLayer layer = new AnimatorControllerLayer
@@ -351,6 +366,13 @@ namespace VRCFaceTracking.EditorTools
             AnimatorControllerParameter smootherParam = ParameterTools.CheckAndCreateParameter(baseParamName + "Smoother", animatorController, 1, 0.8);
             ParameterTools.CheckAndCreateParameter(baseParamName + "Proxy", animatorController, 1);
             ParameterTools.CheckAndCreateParameter(baseParamName, animatorController, 1);
+
+            // Clear out existing ...Binary layers to make-way for an updated one
+            for (int i = 0; i < animatorController.layers.Length; i++)
+                if (animatorController.layers[i].name == baseParamName + " Float Smoother")
+                {
+                    animatorController.RemoveLayer(i);
+                }
 
             // Creates an animation layer
             AnimatorControllerLayer layer = new AnimatorControllerLayer
