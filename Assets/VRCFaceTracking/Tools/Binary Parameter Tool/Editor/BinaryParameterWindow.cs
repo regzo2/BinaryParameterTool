@@ -1,39 +1,52 @@
 ﻿using UnityEngine;
 using UnityEditor;
 using UnityEditor.Animations;
+using VRC.SDK3.Avatars.Components;
+using VRC.SDK3.Avatars.ScriptableObjects;
+using System.Collections.Generic;
 
 namespace VRCFaceTracking.EditorTools
 {
     public class BinaryParameterWindow : EditorWindow
     {
         private BinaryStateMachine _binaryStateMachine;
+        private VRCAvatarDescriptor _avdescriptor;
     
         private AnimationClip _initClip;
         private AnimationClip _finalClip;
         private AnimationClip _finalNegativeClip;
 
         private AnimatorController _animatorController;
+        private List<AnimatorController> _controllers;
 
         private bool _isCombined = false;
         private bool _nextStateInterrupt = true;
         private bool _writeDefaults = true;
+        private bool _smooth = true;
 
         private float _min = 0f;
         private float _max = 1f;
         private float _minNeg = 0f;
         private float _maxNeg = 1f;
         private float _duration = 0.1f;
+        private float _smoothness = 0.9f;
 
         private int _binarySize;
         private int _binarySizeTemp;
+        private int _layerSelect;
         private int _tab;
 
         private string _baseParamName;
 
         readonly private string[] _binarySizeSelection = new string[]
-            {
-                "2","4","8","16","32"
-            };
+        {
+            "2","4","8","16","32"
+        };
+
+        readonly private string[] _animatorSelection = new string[]
+        {
+            "Base","Additive","Gesture","Action","FX"
+        };
 
         [MenuItem("Tools/VRCFaceTracking/Binary Parameter Tool")]
         public static void ShowWindow()
@@ -51,8 +64,8 @@ namespace VRCFaceTracking.EditorTools
             };
 
             EditorGUILayout.LabelField("<size=12><color=white><b>Avatar Properties</b></color></size>", style);
-
-        _animatorController = (AnimatorController)EditorGUILayout.ObjectField
+            /*
+            _animatorController = (AnimatorController)EditorGUILayout.ObjectField
             (
                 new GUIContent
                 (
@@ -63,13 +76,46 @@ namespace VRCFaceTracking.EditorTools
                 typeof(AnimatorController),
                 true
             );
+            */
 
-            _binaryStateMachine.animatorController = _animatorController;
+            _avdescriptor = (VRCAvatarDescriptor)EditorGUILayout.ObjectField
+            (
+                new GUIContent
+                (
+                    "Avatar",
+                    "The VRC Avatar that will have the Binary Parameters set up on. " +
+                    "The Avatar must have a VRCAvatarDescriptor to show up in this field."
+                ),
+                _avdescriptor,
+                typeof(VRCAvatarDescriptor),
+                true
+            );
 
-            if (_animatorController != null)
+            if (_avdescriptor != null)
             {
                 if (_animatorController == null)
                     return;
+
+                _layerSelect = EditorGUILayout.Popup
+                (
+                    new GUIContent
+                    (
+                        "Layer",
+                        "This selects what VRChat Playable Layer you would like to set up " +
+                        "the following Binary Animation Layer into. A layer must be populated " +
+                        "in order for the tool to properly set up an Animation Layer."
+                    ),
+                    _layerSelect,
+                    _animatorSelection
+                );
+
+                _binaryStateMachine.animatorController = AssetDatabase.LoadAssetAtPath<AnimatorController>(AssetDatabase.GetAssetPath(_avdescriptor.baseAnimationLayers[_layerSelect].animatorController));
+
+                if (_binaryStateMachine.animatorController == null)
+                {
+                    EditorGUILayout.HelpBox("This Playable Layer must have an Animator Controller in order for the Binary Parameter Tool to work with it.", MessageType.Warning, true);
+                    return;
+                }
 
                 EditorGUILayout.Space();
                 EditorGUILayout.LabelField("<size=12><color=white><b>Parameter Properties</b></color></size>", style);
@@ -297,6 +343,31 @@ namespace VRCFaceTracking.EditorTools
                     _writeDefaults
                 );
 
+                if (_tab == 0)
+                    _smooth = EditorGUILayout.Toggle
+                    (
+                        new GUIContent
+                        (
+                            "Smoother Float Layer",
+                            "Creates an animation layer that smooths out " +
+                            "the driven float using a feedback loop."
+                        ),
+                        _smooth
+                    );
+
+                if (_tab == 0 && _smooth)
+                    _smoothness = EditorGUILayout.FloatField
+                    (
+                        new GUIContent
+                        (
+                            "Smoothness",
+                            "What percentage of the actual value gets multiplied with the " +
+                            "driven Float parameter. The higher the number the smoother the " +
+                            "parameter gets blended. Recommended 0.9"
+                        ),
+                        _smoothness
+                    );
+
                 _binaryStateMachine.writeDefaults = _writeDefaults;
 
                 EditorGUILayout.Space();
@@ -311,12 +382,21 @@ namespace VRCFaceTracking.EditorTools
                             "set animations, transitions, and parameters that handle the specified Binary Parameter."
                         )))
                     {
-                        if (_tab == 0)
+                        if (_tab == 0 && !_smooth)
                         {
                             ParameterTools.CheckAndCreateParameter(_baseParamName, _animatorController, 1);
 
                             _binaryStateMachine.initClip = BinaryParameterFloatDriver.CreateFloatDriverAnimation(_baseParamName, 0f);
                             _binaryStateMachine.finalClip = BinaryParameterFloatDriver.CreateFloatDriverAnimation(_baseParamName, 1f);
+                        }
+                        else if (_tab == 0)
+                        {
+                            ParameterTools.CheckAndCreateParameter(_baseParamName, _animatorController, 1);
+
+                            _binaryStateMachine.CreateSmoothingLayer(_smoothness);
+
+                            _binaryStateMachine.initClip = BinaryParameterFloatDriver.CreateFloatDriverAnimation(_baseParamName + "Proxy", 0f);
+                            _binaryStateMachine.finalClip = BinaryParameterFloatDriver.CreateFloatDriverAnimation(_baseParamName + "Proxy", 1f);
                         }
                         _binaryStateMachine.CreateBinaryLayer();
                     }
@@ -330,7 +410,7 @@ namespace VRCFaceTracking.EditorTools
                         "set animations, transitions, and parameters that handle the specified Combined Binary Parameter."
                     )))
                 {
-                    if (_tab == 0)
+                    if (_tab == 0 && !_smooth)
                     {
                         ParameterTools.CheckAndCreateParameter(_baseParamName, _animatorController, 1);
 
@@ -338,10 +418,28 @@ namespace VRCFaceTracking.EditorTools
                         _binaryStateMachine.finalClip = BinaryParameterFloatDriver.CreateFloatDriverAnimation(_baseParamName, 1f);
                         _binaryStateMachine.finalNegativeClip = BinaryParameterFloatDriver.CreateFloatDriverAnimation(_baseParamName, -1f);
                     }
+                    else if (_tab == 0)
+                    {
+                        ParameterTools.CheckAndCreateParameter(_baseParamName, _animatorController, 1);
+
+                        _binaryStateMachine.CreateSmoothingLayer(_smoothness);
+                        _binaryStateMachine.initClip = BinaryParameterFloatDriver.CreateFloatDriverAnimation(_baseParamName + "Proxy", 0f);
+                        _binaryStateMachine.finalClip = BinaryParameterFloatDriver.CreateFloatDriverAnimation(_baseParamName + "Proxy", 1f);
+                        _binaryStateMachine.finalNegativeClip = BinaryParameterFloatDriver.CreateFloatDriverAnimation(_baseParamName + "Proxy", -1f);
+                    }
                     _binaryStateMachine.CreateCombinedBinaryLayer();
                 }
 
                 EditorGUILayout.HelpBox("Parameters To Add:" + GenerateParamNames(_baseParamName, _binarySize, _isCombined), MessageType.None);
+                foreach (VRCAvatarDescriptor.CustomAnimLayer layer in _avdescriptor.baseAnimationLayers)
+                {
+                    var controller = UnityEditor.AssetDatabase.LoadAssetAtPath<AnimatorController>(UnityEditor.AssetDatabase.GetAssetPath(layer.animatorController));
+                    if (controller == null)
+                    {
+                        continue;
+                    }
+                    EditorGUILayout.TextArea(controller.ToString());
+                }
             }
         }
 
