@@ -299,48 +299,6 @@ namespace VRCFaceTracking.EditorTools
                 }
 
                 EditorGUILayout.Space();
-                _duration = EditorGUILayout.FloatField
-                (
-                    new GUIContent
-                    (
-                        "Transition Duration",
-                        "How long does it take to transition to the active step? Lower values " +
-                        "will be quicker but look more 'steppy', while higher values will look " +
-                        "smoother but may feel 'sluggish' A good middle ground is 0.1 for 8 " +
-                        "Resolution, more duration on less resolution and vice versa"
-                    ),
-                    _duration
-                );
-
-                _binaryStateMachine.duration = _duration;
-
-                _nextStateInterrupt = EditorGUILayout.Toggle
-                (
-                    new GUIContent
-                    (
-                        "Next State Interrupt",
-                        "Cant the next state interrupt the current transition? Very " +
-                        "useful in making the animation states better connect with " +
-                        "the current parameter value (less delay)."
-                    ),
-                    _nextStateInterrupt
-                );
-
-                _binaryStateMachine.nextStateInterrupt = _nextStateInterrupt;
-
-                _writeDefaults = EditorGUILayout.Toggle
-                (
-                    new GUIContent
-                    (
-                        "Write Defaults",
-                        "Can the Animations on this layer set unbound Animation Properties to their default " +
-                        "values? Recommended to keep this off to avoid blendshape animation conflicts. WARNING: " +
-                        "You will run into issues if you have Write Defaults enabled and disabled on different " +
-                        "animations, use a tool like AV3Manager to set Write Defaults to a universal enable/disable."
-
-                    ),
-                    _writeDefaults
-                );
 
                 if (_tab == 0)
                     _smooth = EditorGUILayout.Toggle
@@ -366,6 +324,59 @@ namespace VRCFaceTracking.EditorTools
                         ),
                         _smoothness
                     );
+
+                if (!_smooth)
+                {
+                    _duration = EditorGUILayout.FloatField
+                    (
+                        new GUIContent
+                        (
+                            "Transition Duration",
+                            "How long does it take to transition to the active step? Lower values " +
+                            "will be quicker but look more 'steppy', while higher values will look " +
+                            "smoother but may feel 'sluggish' A good middle ground is 0.1 for 8 " +
+                            "Resolution, more duration on less resolution and vice versa"
+                        ),
+                        _duration
+                    );
+
+                    _binaryStateMachine.duration = _duration;
+
+                    _nextStateInterrupt = EditorGUILayout.Toggle
+                   (
+                       new GUIContent
+                       (
+                           "Next State Interrupt",
+                           "Cant the next state interrupt the current transition? Very " +
+                           "useful in making the animation states better connect with " +
+                           "the current parameter value (less delay)."
+                       ),
+                       _nextStateInterrupt
+                   );
+
+                    _binaryStateMachine.nextStateInterrupt = _nextStateInterrupt;
+                }
+
+                else
+                {
+                    _binaryStateMachine.duration = 0;
+                    _binaryStateMachine.nextStateInterrupt = false;
+                }
+
+
+                _writeDefaults = EditorGUILayout.Toggle
+                (
+                    new GUIContent
+                    (
+                        "Write Defaults",
+                        "Can the Animations on this layer set unbound Animation Properties to their default " +
+                        "values? Recommended to keep this off to avoid blendshape animation conflicts. WARNING: " +
+                        "You will run into issues if you have Write Defaults enabled and disabled on different " +
+                        "animations, use a tool like AV3Manager to set Write Defaults to a universal enable/disable."
+
+                    ),
+                    _writeDefaults
+                );
 
                 _binaryStateMachine.writeDefaults = _writeDefaults;
 
