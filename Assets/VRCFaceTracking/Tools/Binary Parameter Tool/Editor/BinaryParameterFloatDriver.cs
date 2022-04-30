@@ -83,11 +83,11 @@ namespace VRCFaceTracking.EditorTools
                 Directory.CreateDirectory("Assets/VRCFaceTracking/Generated/Anims/");
             }
 
-            string[] guid = (AssetDatabase.FindAssets(baseParamName + initThreshold + "Smoother"));
+            string[] guid = (AssetDatabase.FindAssets(baseParamName + initThreshold + "Smoother.anim"));
 
             if (guid.Length == 0)
             {
-                AssetDatabase.CreateAsset(_animationClip1, "Assets/VRCFaceTracking/Generated/Anims/"+ baseParamName + initThreshold + " Smoother");
+                AssetDatabase.CreateAsset(_animationClip1, "Assets/VRCFaceTracking/Generated/Anims/"+ baseParamName + initThreshold + " Smoother.anim");
                 AssetDatabase.SaveAssets();
             }
 
@@ -96,11 +96,11 @@ namespace VRCFaceTracking.EditorTools
                 _animationClip1 = (AnimationClip)AssetDatabase.LoadAssetAtPath(AssetDatabase.GUIDToAssetPath(guid[0]), typeof(AnimationClip));
             }
 
-            guid = (AssetDatabase.FindAssets(baseParamName + finalThreshold + "Smoother"));
+            guid = (AssetDatabase.FindAssets(baseParamName + finalThreshold + "Smoother.anim"));
 
             if (guid.Length == 0)
             {
-                AssetDatabase.CreateAsset(_animationClip2, "Assets/VRCFaceTracking/Generated/Anims/" + baseParamName + finalThreshold + " Smoother");
+                AssetDatabase.CreateAsset(_animationClip2, "Assets/VRCFaceTracking/Generated/Anims/" + baseParamName + finalThreshold + " Smoother.anim");
                 AssetDatabase.SaveAssets();
             }
 
