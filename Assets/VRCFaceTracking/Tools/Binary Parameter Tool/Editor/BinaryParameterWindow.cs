@@ -464,7 +464,7 @@ namespace VRCFaceTracking.EditorTools
                     else
                         EditorGUILayout.HelpBox("Parameters can not fit, or Expressions Parameters do not exist.", MessageType.Warning);
                 }
-                EditorGUILayout.HelpBox("Parameters (" + _avDescriptor.expressionParameters.CalcTotalCost() + "/128):" + GenerateParamNames(_baseParamName, _binarySize, _isCombined), MessageType.None);
+                EditorGUILayout.HelpBox("Parameters (" + _avDescriptor.expressionParameters.CalcTotalCost() + "/" + VRCExpressionParameters.MAX_PARAMETER_COST + "):" + GenerateParamNames(_baseParamName, _binarySize, _isCombined), MessageType.None);
 
             }
         }

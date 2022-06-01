@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEditor.Animations;
 using UnityEditor;
+using System;
 
 namespace VRCFaceTracking.EditorTools
 {
@@ -46,7 +47,7 @@ namespace VRCFaceTracking.EditorTools
 
             nextStateInterrupt = true;
             writeDefaults = true;
-    }
+        }
 
         public void CreateBinaryLayer()
         {
@@ -85,8 +86,13 @@ namespace VRCFaceTracking.EditorTools
 
             var rootStateMachine = layer.stateMachine;
 
-            // Creating a Binary State Machine
-            CreateBinaryStatesInMachine(baseParamName, binarySize, rootStateMachine, initClip, finalClip, writeDefaults, duration, nextStateInterrupt, min, max);
+            /* IMPLEMENT IN NEXT UPDATE PLS LOL
+            // Creating branching Binary State Machine
+            CreateBranchingBinaryStatesInMachine(baseParamName, binarySize, rootStateMachine, initClip, finalClip, writeDefaults, duration, nextStateInterrupt, min, max);
+            */
+
+            // Creating branching Binary State Machine
+            CreateUniformBinaryStatesInMachine(baseParamName, binarySize, rootStateMachine, initClip, finalClip, writeDefaults, duration, nextStateInterrupt, min, max);
         }
 
         public void CreateCombinedBinaryLayer()
@@ -129,7 +135,7 @@ namespace VRCFaceTracking.EditorTools
             var rootStateMachine = layer.stateMachine;
 
             // Creating a Combined Binary State Machine
-            CreateCombinedBinaryStatesInMachine(baseParamName, binarySize, rootStateMachine, initClip, finalClip, finalNegativeClip, writeDefaults, duration, nextStateInterrupt, min, max, minNeg, maxNeg);
+            CreateCombinedUniformBinaryStatesInMachine(baseParamName, binarySize, rootStateMachine, initClip, finalClip, finalNegativeClip, writeDefaults, duration, nextStateInterrupt, min, max, minNeg, maxNeg);
         }
 
 
@@ -168,7 +174,7 @@ namespace VRCFaceTracking.EditorTools
             }
         }
 
-        private static void CreateCombinedBinaryStatesInMachine(string name, int binarySize, AnimatorStateMachine stateMachine, AnimationClip initClip, AnimationClip finalClip, AnimationClip finalNegativeClip, bool writeDefaults, float duration, bool nextStateInterrupt, float min, float max, float minNeg, float maxNeg)
+        private static void CreateCombinedUniformBinaryStatesInMachine(string name, int binarySize, AnimatorStateMachine stateMachine, AnimationClip initClip, AnimationClip finalClip, AnimationClip finalNegativeClip, bool writeDefaults, float duration, bool nextStateInterrupt, float min, float max, float minNeg, float maxNeg)
         {
             int negativeCount = 1;
 
@@ -290,7 +296,7 @@ namespace VRCFaceTracking.EditorTools
             }
         }
 
-        private static void CreateBinaryStatesInMachine(string name, int binarySize, AnimatorStateMachine stateMachine, AnimationClip initClip, AnimationClip finalClip, bool writeDefaults, float duration, bool nextStateInterrupt, float min, float max)
+        private static void CreateUniformBinaryStatesInMachine(string name, int binarySize, AnimatorStateMachine stateMachine, AnimationClip initClip, AnimationClip finalClip, bool writeDefaults, float duration, bool nextStateInterrupt, float min, float max)
         {
             int binarySteps = (int)Mathf.Pow(2, binarySize);
 
@@ -359,6 +365,130 @@ namespace VRCFaceTracking.EditorTools
                 states[i].motion = _blendTree;
                 states[i].writeDefaultValues = writeDefaults;
             }
+        }
+
+        private static void CreateBranchingBinaryStatesInMachine(string name, int binarySize, AnimatorStateMachine stateMachine, AnimationClip initClip, AnimationClip finalClip, bool writeDefaults, float duration, bool nextStateInterrupt, float min, float max, AnimationClip finalNegativeClip = null, float minNeg = 0, float maxNeg = 0)
+        {
+            // Skips creating the negative & positive branch
+            bool skipNegative = false;
+            if (finalNegativeClip == null)
+                skipNegative = true;
+
+            // How many steps in-between the minimum and maximum value.
+            int binarySteps = (int)Mathf.Pow(2, binarySize);
+
+            int minSteps = (int)((min + .05) * binarySteps);
+            int maxSteps = (int)((max - .05) * binarySteps);
+
+            stateMachine.name = name + " Binary State Machine";
+            stateMachine.entryPosition = new Vector3(0, 20, 0);
+            stateMachine.anyStatePosition = new Vector3
+            (
+                20,
+                stateMachine.entryPosition.x - 10 - Mathf.Cos(0) * (150 + binarySteps * 4),
+                0
+            );
+
+            AnimatorState[] finalStates = new AnimatorState[binarySteps];
+
+            for (int i = 0; i < finalStates.Length; i++)
+            {
+                finalStates[i] = stateMachine.AddState("test");
+            }
+
+            for (int i = 0; i < binarySteps; i++)
+            {
+                // Exit state conditions
+                for (int j = 0; j < binarySize; j++)
+                {
+                    AnimatorStateTransition _exitStateTransition = finalStates[i].AddExitTransition();
+
+                    int _conditionSetTrue = (i >> j) & 1;
+
+                    if (_conditionSetTrue == 1)
+                        _exitStateTransition.AddCondition(AnimatorConditionMode.IfNot, 0, name + Mathf.Pow(2, j));
+                    else _exitStateTransition.AddCondition(AnimatorConditionMode.If, 0, name + Mathf.Pow(2, j));
+
+                    _exitStateTransition.duration = 0;
+                }
+
+                BlendTree _blendTree = new BlendTree
+                {
+                    blendType = BlendTreeType.Simple1D,
+                    hideFlags = HideFlags.HideInHierarchy,
+                    blendParameter = "BinaryBlend",
+                    name = name + i,
+                    useAutomaticThresholds = false,
+                };
+
+                // Need this function to serialize the BlendTrees, otherwise they go byebye
+                if (AssetDatabase.GetAssetPath(stateMachine) != string.Empty)
+                {
+                    AssetDatabase.AddObjectToAsset(_blendTree, AssetDatabase.GetAssetPath(stateMachine));
+                }
+
+                _blendTree.AddChild(initClip, minSteps + (int)((-1) * (i * (binarySteps) / (binarySteps))));
+                _blendTree.AddChild(finalClip, maxSteps - i * (binarySteps) / (binarySteps));
+
+                finalStates[i].motion = _blendTree;
+                finalStates[i].writeDefaultValues = writeDefaults;
+            }
+
+            ConvergeBinaryEndStates(finalStates, stateMachine, name);
+        }
+
+        private static void ConvergeBinaryEndStates(AnimatorState[] states, AnimatorStateMachine stateMachine, string name, int binaryIter = 1)
+        {
+            // Breaks out of recursion once there are 2 states left.
+            if (states.Length == 2)
+            {
+                AnimatorState basisState = stateMachine.AddState("test");
+
+                AnimatorStateTransition[] basistransitions = new AnimatorStateTransition[2];
+
+                basistransitions[0] = basisState.AddTransition(states[0]);
+
+                for (int i = 0; i < basistransitions.Length; i++)
+                {
+                    basistransitions[i] = basisState.AddTransition(states[i]);
+                    basistransitions[i].duration = 0;
+                    basistransitions[i].exitTime = 0;
+                }
+
+                basistransitions[0].AddCondition(AnimatorConditionMode.IfNot, 0, name + binaryIter);
+                basistransitions[1].AddCondition(AnimatorConditionMode.If, 0, name + binaryIter);
+
+                return;
+            }
+
+            // Node states that are to be recursively sent until binary size is 1.
+            AnimatorState[] nodeStates = new AnimatorState[states.Length / 2];
+
+            // Assigning the new nodes to the State Machine
+            for (int i = 0; i < nodeStates.Length; i++)
+            {
+                nodeStates[i] = stateMachine.AddState("test");
+            }
+
+            // Pair even/odd states and hook them to a node state. The node states will be half the number of binary states
+            for (int i = 0; i < states.Length; i++)
+            {
+                int nodeIter = (int)(Math.Ceiling((i + .5) / 2) - 1);
+
+                AnimatorStateTransition _transition = nodeStates[nodeIter].AddTransition(states[i]);
+
+                if (i % 2 == 1)
+                    _transition.AddCondition(AnimatorConditionMode.If, 0, name + binaryIter);
+                else
+                {
+                    _transition.AddCondition(AnimatorConditionMode.IfNot, 0, name + binaryIter);
+                }
+
+                _transition.duration = 0;
+                _transition.exitTime = 0;
+            }
+
+            ConvergeBinaryEndStates(nodeStates, stateMachine, name, binaryIter * 2);
         }
 
         public void CreateSmoothingLayer(float smoothness)
