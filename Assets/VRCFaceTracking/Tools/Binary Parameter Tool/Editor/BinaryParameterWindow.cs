@@ -23,6 +23,7 @@ namespace VRCFaceTracking.EditorTools
         private bool _nextStateInterrupt = true;
         private bool _writeDefaults = true;
         private bool _smooth = true;
+        private bool _createParametersInDescriptor = true;
 
         private float _min = 0f;
         private float _max = 1f;
@@ -163,6 +164,18 @@ namespace VRCFaceTracking.EditorTools
                 );
 
                 _binaryStateMachine.isCombined = _isCombined;
+
+                _createParametersInDescriptor = EditorGUILayout.Toggle
+                (
+                    new GUIContent
+                    (
+                        "Create Parameters",
+                        "Allow the tool to populate the Expressions Parameters " +
+                        "with the listed Binary parameters. Toggle this off if you " +
+                        "would like to be able to just create Binary animations only."
+                    ),
+                    _createParametersInDescriptor
+                );
 
                 int _memoryUsage = (_binarySize + (_isCombined ? 1 : 0));
 
@@ -392,33 +405,32 @@ namespace VRCFaceTracking.EditorTools
                             "set animations, transitions, and parameters that handle the specified Binary Parameter."
                         )))
                     {
-                        if (_tab == 0 && !_smooth)
+                        if (ParameterTools.AddVRCParameter(_avDescriptor, GenerateBinaryParams(_baseParamName, _binarySize, _isCombined)) | !_createParametersInDescriptor)
                         {
-                            ParameterTools.CheckAndCreateParameter(_baseParamName, _animatorController, 1);
-
-                            _binaryStateMachine.initClip = BinaryParameterFloatDriver.CreateFloatDriverAnimation(_baseParamName, 0f);
-                            _binaryStateMachine.finalClip = BinaryParameterFloatDriver.CreateFloatDriverAnimation(_baseParamName, 1f);
-                        }
-                        else if (_tab == 0)
-                        {
-                            ParameterTools.CheckAndCreateParameter(_baseParamName, _animatorController, 1);
-
-                            _binaryStateMachine.CreateSmoothingLayer(_smoothness);
-
-                            _binaryStateMachine.initClip = BinaryParameterFloatDriver.CreateFloatDriverAnimation(_baseParamName + "Proxy", 0f);
-                            _binaryStateMachine.finalClip = BinaryParameterFloatDriver.CreateFloatDriverAnimation(_baseParamName + "Proxy", 1f);
-                        }
-                        if (ParameterTools.AddVRCParameter(_avDescriptor, GenerateBinaryParams(_baseParamName, _binarySize, _isCombined)))
-                        {
-                            ParameterTools.RemoveVRCParameter(_avDescriptor, new VRCExpressionParameters.Parameter
+                            if (_tab == 0 && !_smooth)
                             {
-                                name = _baseParamName,
-                                valueType = VRCExpressionParameters.ValueType.Float
-                            });
-                            _binaryStateMachine.CreateBinaryLayer();
+                                ParameterTools.CheckAndCreateParameter(_baseParamName, _animatorController, 1);
+
+                                _binaryStateMachine.initClip = BinaryParameterFloatDriver.CreateFloatDriverAnimation(_baseParamName, 0f);
+                                _binaryStateMachine.finalClip = BinaryParameterFloatDriver.CreateFloatDriverAnimation(_baseParamName, 1f);
+                            }
+                            else if (_tab == 0)
+                            {
+                                ParameterTools.CheckAndCreateParameter(_baseParamName, _animatorController, 1);
+
+                                _binaryStateMachine.CreateSmoothingLayer(_smoothness);
+
+                                _binaryStateMachine.initClip = BinaryParameterFloatDriver.CreateFloatDriverAnimation(_baseParamName + "Proxy", 0f);
+                                _binaryStateMachine.finalClip = BinaryParameterFloatDriver.CreateFloatDriverAnimation(_baseParamName + "Proxy", 1f);
+                            }
+                            if (ParameterTools.AddVRCParameter(_avDescriptor, GenerateBinaryParams(_baseParamName, _binarySize, _isCombined)))
+                            {
+                                ParameterTools.RemoveVRCParameter(_avDescriptor, _baseParamName);
+                                _binaryStateMachine.CreateBinaryLayer();
+                            }
+                            else
+                                EditorGUILayout.HelpBox("Parameters can not fit, or Expressions Parameters do not exist.", MessageType.Warning);
                         }
-                        else
-                            EditorGUILayout.HelpBox("Parameters can not fit, or Expressions Parameters do not exist.", MessageType.Warning);
                     }
                 }
                 else if (GUILayout.Button
@@ -430,7 +442,7 @@ namespace VRCFaceTracking.EditorTools
                         "set animations, transitions, and parameters that handle the specified Combined Binary Parameter."
                     )))
                 {
-                    if (ParameterTools.AddVRCParameter(_avDescriptor, GenerateBinaryParams(_baseParamName, _binarySize, _isCombined)))
+                    if (ParameterTools.AddVRCParameter(_avDescriptor, GenerateBinaryParams(_baseParamName, _binarySize, _isCombined)) | !_createParametersInDescriptor)
                     {
                         if (_tab == 0 && !_smooth)
                         {
@@ -447,11 +459,7 @@ namespace VRCFaceTracking.EditorTools
                         }
                         else if (_tab == 0)
                         {
-                            ParameterTools.RemoveVRCParameter(_avDescriptor, new VRCExpressionParameters.Parameter
-                            {
-                                name = _baseParamName,
-                                valueType = VRCExpressionParameters.ValueType.Float
-                            });
+                            ParameterTools.RemoveVRCParameter(_avDescriptor, _baseParamName);
                             ParameterTools.CheckAndCreateParameter(_baseParamName, _animatorController, 1);
 
                             _binaryStateMachine.CreateSmoothingLayer(_smoothness);
