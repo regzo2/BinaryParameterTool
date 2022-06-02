@@ -15,7 +15,7 @@ namespace VRCFaceTracking.EditorTools
         {
             // Metric to gauge additional Expression Parameter's storage cost
             int paramTotalCost = 0;
-            int maximumSize = VRCExpressionParameters.MAX_PARAMETER_COST;
+            int maxCost = VRCExpressionParameters.MAX_PARAMETER_COST;
 
             paramTotalCost += avatarDescriptor.expressionParameters.CalcTotalCost();
 
@@ -25,12 +25,19 @@ namespace VRCFaceTracking.EditorTools
                 Debug.Log("ExpressionsParameters not found!");
                 return false;
             }
-            // Make sure Parameters aren't filled up on space.
-            if (paramTotalCost > maximumSize)
+
+            // Checks to see if parameter already exists; calculate new total parameter cost
+            foreach (VRCExpressionParameters.Parameter param in parameters)
+                if (avatarDescriptor.expressionParameters.FindParameter(param.name) == null)
+                    paramTotalCost += (param.valueType == VRCExpressionParameters.ValueType.Bool ? 1 : 8);
+
+            // exit if expected total parameter cost exceeds max of the parameters'`4 bits
+            if (paramTotalCost > maxCost)
             {
                 Debug.Log("Additional Expression Parameters exceed maximum storage. : " + paramTotalCost);
                 return false;
             }
+
             // Instantiate and Save to Database
             VRCExpressionParameters newParameters = avatarDescriptor.expressionParameters;
             string assetPath = AssetDatabase.GetAssetPath(avatarDescriptor.expressionParameters);
@@ -39,17 +46,6 @@ namespace VRCFaceTracking.EditorTools
                 AssetDatabase.RemoveObjectFromAsset(avatarDescriptor.expressionParameters);
                 AssetDatabase.CreateAsset(newParameters, assetPath);
                 avatarDescriptor.expressionParameters = newParameters;
-            }
-
-            // Checks to see if parameter already exists in calculation
-            foreach (VRCExpressionParameters.Parameter param in parameters)
-                if (avatarDescriptor.expressionParameters.FindParameter(param.name) == null)
-                    paramTotalCost = param.valueType == VRCExpressionParameters.ValueType.Bool ? 1 : 8;
-
-            if (paramTotalCost > maximumSize)
-            {
-                Debug.Log("Additional Expression Parameters exceed maximum storage. : " + paramTotalCost);
-                return false;
             }
 
             foreach (VRCExpressionParameters.Parameter parameter in parameters)

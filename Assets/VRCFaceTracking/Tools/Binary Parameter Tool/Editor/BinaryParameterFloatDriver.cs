@@ -87,7 +87,7 @@ namespace VRCFaceTracking.EditorTools
 
             if (guid.Length == 0)
             {
-                AssetDatabase.CreateAsset(_animationClip1, "Assets/VRCFaceTracking/Generated/Anims/"+ baseParamName + initThreshold + " Smoother.anim");
+                AssetDatabase.CreateAsset(_animationClip1, "Assets/VRCFaceTracking/Generated/Anims/"+ baseParamName + initThreshold + "Smoother.anim");
                 AssetDatabase.SaveAssets();
             }
 
@@ -100,7 +100,7 @@ namespace VRCFaceTracking.EditorTools
 
             if (guid.Length == 0)
             {
-                AssetDatabase.CreateAsset(_animationClip2, "Assets/VRCFaceTracking/Generated/Anims/" + baseParamName + finalThreshold + " Smoother.anim");
+                AssetDatabase.CreateAsset(_animationClip2, "Assets/VRCFaceTracking/Generated/Anims/" + baseParamName + finalThreshold + "Smoother.anim");
                 AssetDatabase.SaveAssets();
             }
 
