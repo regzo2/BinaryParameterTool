@@ -367,6 +367,7 @@ namespace VRCFaceTracking.EditorTools
             }
         }
 
+        // implement next update pls
         private static void CreateBranchingBinaryStatesInMachine(string name, int binarySize, AnimatorStateMachine stateMachine, AnimationClip initClip, AnimationClip finalClip, bool writeDefaults, float duration, bool nextStateInterrupt, float min, float max, AnimationClip finalNegativeClip = null, float minNeg = 0, float maxNeg = 0)
         {
             // Skips creating the negative & positive branch
