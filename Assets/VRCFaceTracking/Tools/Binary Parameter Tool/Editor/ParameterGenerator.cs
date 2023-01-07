@@ -17,14 +17,14 @@ namespace VRCFaceTracking.EditorTools
             int paramTotalCost = 0;
             int maxCost = VRCExpressionParameters.MAX_PARAMETER_COST;
 
-            paramTotalCost += avatarDescriptor.expressionParameters.CalcTotalCost();
-
             // Make sure Parameters aren't null
             if (avatarDescriptor.expressionParameters == null)
             {
                 Debug.Log("ExpressionsParameters not found!");
                 return false;
             }
+
+            paramTotalCost += avatarDescriptor.expressionParameters.CalcTotalCost();
 
             // Checks to see if parameter already exists; calculate new total parameter cost
             foreach (VRCExpressionParameters.Parameter param in parameters)
@@ -100,7 +100,7 @@ namespace VRCFaceTracking.EditorTools
             return true;
         }
 
-        public static bool RemoveVRCParameter(VRCAvatarDescriptor avatarDescriptor, VRCExpressionParameters.Parameter parameter)
+        public static bool RemoveVRCParameter(VRCAvatarDescriptor avatarDescriptor, VRCExpressionParameters.Parameter parameter, bool floatOnly=false)
         {
             // Make sure Parameters aren't null
             if (avatarDescriptor.expressionParameters == null)
@@ -121,12 +121,55 @@ namespace VRCFaceTracking.EditorTools
 
              // Check and see if parameter exists
             VRCExpressionParameters.Parameter foundParameter = newParameters.FindParameter(parameter.name);
-            if (newParameters.FindParameter(parameter.name) != null)
+            if (foundParameter != null)
             {
+                // is parameter not a float?
+                if (floatOnly && foundParameter.valueType != VRCExpressionParameters.ValueType.Float)
+                {
+                    Debug.Log("Tried to remove float parameter " + parameter.name + " but it was not a float. Ignoring");
+                    return false;
+                }
+
                 // Remove the parameter
                 List<VRCExpressionParameters.Parameter> betterParametersBecauseItsAListInstead =
                     newParameters.parameters.ToList();
                 betterParametersBecauseItsAListInstead.Remove(newParameters.FindParameter(parameter.name));
+                newParameters.parameters = betterParametersBecauseItsAListInstead.ToArray();
+            }
+            return true;
+        }
+
+        // kept for future use
+        public static bool RemoveVRCParametersByStem(VRCAvatarDescriptor avatarDescriptor, string parameterStem)
+        {
+            // Make sure Parameters aren't null
+            if (avatarDescriptor.expressionParameters == null)
+            {
+                Debug.Log("ExpressionsParameters not found!");
+                return false;
+            }
+
+            // Instantiate and Save to Database
+            VRCExpressionParameters newParameters = avatarDescriptor.expressionParameters;
+            string assetPath = AssetDatabase.GetAssetPath(avatarDescriptor.expressionParameters);
+            if (assetPath != String.Empty)
+            {
+                AssetDatabase.RemoveObjectFromAsset(avatarDescriptor.expressionParameters);
+                AssetDatabase.CreateAsset(newParameters, assetPath);
+                avatarDescriptor.expressionParameters = newParameters;
+            }
+
+            // Check and see if parameter exists
+            if (newParameters.FindParameter(parameterStem) != null)
+            {
+                // Remove the parameters with listed keyword
+                List<VRCExpressionParameters.Parameter> betterParametersBecauseItsAListInstead =
+                    newParameters.parameters.ToList();
+
+                // Remove without editing the collection being looped
+                betterParametersBecauseItsAListInstead = 
+                    betterParametersBecauseItsAListInstead.Where(p => !p.name.Contains(parameterStem)).ToList(); 
+
                 newParameters.parameters = betterParametersBecauseItsAListInstead.ToArray();
             }
             return true;

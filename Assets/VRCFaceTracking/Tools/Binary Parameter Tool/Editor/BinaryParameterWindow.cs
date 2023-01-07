@@ -405,17 +405,45 @@ namespace VRCFaceTracking.EditorTools
                             "set animations, transitions, and parameters that handle the specified Binary Parameter."
                         )))
                     {
-                        if (ParameterTools.AddVRCParameter(_avDescriptor, GenerateBinaryParams(_baseParamName, _binarySize, _isCombined)) | !_createParametersInDescriptor)
+                        bool doAnimationControllerActions = true; 
+                        // creating parameters in VRC avatar parameters asset
+                        if (_createParametersInDescriptor)
                         {
+                            // remove original (float) parameter from VRC avatar parameters asset
+                            // won't remove if it isn't a float!
+                            ParameterTools.RemoveVRCParameter(_avDescriptor, new VRCExpressionParameters.Parameter
+                            {
+                                name = _baseParamName,
+                                valueType = VRCExpressionParameters.ValueType.Float
+                            }, true);
+
+                            if (!ParameterTools.AddVRCParameter(_avDescriptor, GenerateBinaryParams(_baseParamName, _binarySize, _isCombined)))
+                            {
+                                doAnimationControllerActions = false;
+                                // HelpBoxes don't actually show because they show in the time window of the buttonclick
+                                //EditorGUILayout.HelpBox("Parameters can not fit, or Expressions Parameters do not exist.", MessageType.Warning);
+                                EditorUtility.DisplayDialog("Warning", "Parameters can not fit, or Expressions Parameters do not exist.\n" +
+                                    "Aborting binary parameter creation.", "OK");
+                            }
+                        }
+
+                        // animation controller actions
+                        // don't add to animation controller if adding to VRC parameters asset failed
+                        if (doAnimationControllerActions)
+                        {
+                            // no smoothing layer
                             if (_tab == 0 && !_smooth)
                             {
+                                // create parameter in the animation controller
                                 ParameterTools.CheckAndCreateParameter(_baseParamName, _animatorController, 1);
 
                                 _binaryStateMachine.initClip = BinaryParameterFloatDriver.CreateFloatDriverAnimation(_baseParamName, 0f);
                                 _binaryStateMachine.finalClip = BinaryParameterFloatDriver.CreateFloatDriverAnimation(_baseParamName, 1f);
                             }
+                            // with smoothing layer
                             else if (_tab == 0)
                             {
+                                // create parameter in the animation controller
                                 ParameterTools.CheckAndCreateParameter(_baseParamName, _animatorController, 1);
 
                                 _binaryStateMachine.CreateSmoothingLayer(_smoothness);
@@ -423,13 +451,8 @@ namespace VRCFaceTracking.EditorTools
                                 _binaryStateMachine.initClip = BinaryParameterFloatDriver.CreateFloatDriverAnimation(_baseParamName + "Proxy", 0f);
                                 _binaryStateMachine.finalClip = BinaryParameterFloatDriver.CreateFloatDriverAnimation(_baseParamName + "Proxy", 1f);
                             }
-                            if (ParameterTools.AddVRCParameter(_avDescriptor, GenerateBinaryParams(_baseParamName, _binarySize, _isCombined)))
-                            {
-                                ParameterTools.RemoveVRCParameter(_avDescriptor, _baseParamName);
-                                _binaryStateMachine.CreateBinaryLayer();
-                            }
-                            else
-                                EditorGUILayout.HelpBox("Parameters can not fit, or Expressions Parameters do not exist.", MessageType.Warning);
+                            // generates direct binary layer if _tab==1
+                            _binaryStateMachine.CreateBinaryLayer();
                         }
                     }
                 }
@@ -442,24 +465,46 @@ namespace VRCFaceTracking.EditorTools
                         "set animations, transitions, and parameters that handle the specified Combined Binary Parameter."
                     )))
                 {
-                    if (ParameterTools.AddVRCParameter(_avDescriptor, GenerateBinaryParams(_baseParamName, _binarySize, _isCombined)) | !_createParametersInDescriptor)
+                    bool doAnimationControllerActions = true;
+                    // creating parameters in VRC avatar parameters asset
+                    if (_createParametersInDescriptor)
                     {
+                        // remove original (float) parameter from VRC avatar parameters asset
+                        // won't remove if it isn't a float!
+                        ParameterTools.RemoveVRCParameter(_avDescriptor, new VRCExpressionParameters.Parameter
+                        {
+                            name = _baseParamName,
+                            valueType = VRCExpressionParameters.ValueType.Float
+                        }, true);
+
+                        if (!ParameterTools.AddVRCParameter(_avDescriptor, GenerateBinaryParams(_baseParamName, _binarySize, _isCombined)))
+                        {
+                            doAnimationControllerActions = false;
+                            // HelpBoxes don't actually show because they show in the time window of the buttonclick
+                            //EditorGUILayout.HelpBox("Parameters can not fit, or Expressions Parameters do not exist.", MessageType.Warning);
+                            EditorUtility.DisplayDialog("Warning", "Parameters can not fit, or Expressions Parameters do not exist.\n" +
+                                "Aborting binary parameter creation.", "OK");
+                        }
+                    }
+
+                    // animation controller actions
+                    // don't add to animation controller if adding to VRC parameters asset failed
+                    if (doAnimationControllerActions)
+                    {
+                        // no smoothing layer
                         if (_tab == 0 && !_smooth)
                         {
-                            ParameterTools.RemoveVRCParameter(_avDescriptor, new VRCExpressionParameters.Parameter
-                            {
-                                name = _baseParamName,
-                                valueType = VRCExpressionParameters.ValueType.Float
-                            });
+                            // create parameter in the animation controller
                             ParameterTools.CheckAndCreateParameter(_baseParamName, _animatorController, 1);
 
                             _binaryStateMachine.initClip = BinaryParameterFloatDriver.CreateFloatDriverAnimation(_baseParamName, 0f);
                             _binaryStateMachine.finalClip = BinaryParameterFloatDriver.CreateFloatDriverAnimation(_baseParamName, 1f);
                             _binaryStateMachine.finalNegativeClip = BinaryParameterFloatDriver.CreateFloatDriverAnimation(_baseParamName, -1f);
                         }
+                        // with smoothing layer
                         else if (_tab == 0)
                         {
-                            ParameterTools.RemoveVRCParameter(_avDescriptor, _baseParamName);
+                            // create parameter in the animation controller
                             ParameterTools.CheckAndCreateParameter(_baseParamName, _animatorController, 1);
 
                             _binaryStateMachine.CreateSmoothingLayer(_smoothness);
@@ -467,12 +512,14 @@ namespace VRCFaceTracking.EditorTools
                             _binaryStateMachine.finalClip = BinaryParameterFloatDriver.CreateFloatDriverAnimation(_baseParamName + "Proxy", 1f);
                             _binaryStateMachine.finalNegativeClip = BinaryParameterFloatDriver.CreateFloatDriverAnimation(_baseParamName + "Proxy", -1f);
                         }
+                        // generates direct binary layer if _tab==1
                         _binaryStateMachine.CreateCombinedBinaryLayer();
                     }
-                    else
-                        EditorGUILayout.HelpBox("Parameters can not fit, or Expressions Parameters do not exist.", MessageType.Warning);
                 }
-                EditorGUILayout.HelpBox("Parameters (" + _avDescriptor.expressionParameters.CalcTotalCost() + "/" + VRCExpressionParameters.MAX_PARAMETER_COST + "):" + GenerateParamNames(_baseParamName, _binarySize, _isCombined), MessageType.None);
+                EditorGUILayout.Space(); 
+                EditorGUILayout.HelpBox("Parameters (" + _avDescriptor.expressionParameters.CalcTotalCost() + "/" + VRCExpressionParameters.MAX_PARAMETER_COST + ")\n\n" + 
+                    "Binary Parameters to create:" + (_createParametersInDescriptor ? "(Will Add to VRC Expression Parameters)" : "") + 
+                    GenerateParamNames(_baseParamName, _binarySize, _isCombined), MessageType.None);
 
             }
         }
