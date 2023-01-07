@@ -494,12 +494,6 @@ namespace VRCFaceTracking.EditorTools
                         // no smoothing layer
                         if (_tab == 0 && !_smooth)
                         {
-                            // remove only the float parameter from the VRC avatar parameter list
-                            ParameterTools.RemoveVRCParameter(_avDescriptor, new VRCExpressionParameters.Parameter
-                            {
-                                name = _baseParamName,
-                                valueType = VRCExpressionParameters.ValueType.Float
-                            });
                             // create parameter in the animation controller
                             ParameterTools.CheckAndCreateParameter(_baseParamName, _animatorController, 1);
 
@@ -510,12 +504,6 @@ namespace VRCFaceTracking.EditorTools
                         // with smoothing layer
                         else if (_tab == 0)
                         {
-                            // remove only the float parameter from the VRC avatar parameter list
-                            ParameterTools.RemoveVRCParameter(_avDescriptor, new VRCExpressionParameters.Parameter
-                            {
-                                name = _baseParamName,
-                                valueType = VRCExpressionParameters.ValueType.Float
-                            });
                             // create parameter in the animation controller
                             ParameterTools.CheckAndCreateParameter(_baseParamName, _animatorController, 1);
 
