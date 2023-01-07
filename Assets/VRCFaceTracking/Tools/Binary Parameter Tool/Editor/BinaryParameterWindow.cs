@@ -409,6 +409,13 @@ namespace VRCFaceTracking.EditorTools
                         {
                             if (_tab == 0 && !_smooth)
                             {
+                                // remove only the float parameter from the VRC avatar parameter list
+                                ParameterTools.RemoveVRCParameter(_avDescriptor, new VRCExpressionParameters.Parameter
+                                {
+                                    name = _baseParamName,
+                                    valueType = VRCExpressionParameters.ValueType.Float
+                                });
+                                // create parameter in the animation controller
                                 ParameterTools.CheckAndCreateParameter(_baseParamName, _animatorController, 1);
 
                                 _binaryStateMachine.initClip = BinaryParameterFloatDriver.CreateFloatDriverAnimation(_baseParamName, 0f);
@@ -416,6 +423,13 @@ namespace VRCFaceTracking.EditorTools
                             }
                             else if (_tab == 0)
                             {
+                                // remove only the float parameter from the VRC avatar parameter list
+                                ParameterTools.RemoveVRCParameter(_avDescriptor, new VRCExpressionParameters.Parameter
+                                {
+                                    name = _baseParamName,
+                                    valueType = VRCExpressionParameters.ValueType.Float
+                                });
+                                // create parameter in the animation controller
                                 ParameterTools.CheckAndCreateParameter(_baseParamName, _animatorController, 1);
 
                                 _binaryStateMachine.CreateSmoothingLayer(_smoothness);
@@ -423,14 +437,11 @@ namespace VRCFaceTracking.EditorTools
                                 _binaryStateMachine.initClip = BinaryParameterFloatDriver.CreateFloatDriverAnimation(_baseParamName + "Proxy", 0f);
                                 _binaryStateMachine.finalClip = BinaryParameterFloatDriver.CreateFloatDriverAnimation(_baseParamName + "Proxy", 1f);
                             }
-                            if (ParameterTools.AddVRCParameter(_avDescriptor, GenerateBinaryParams(_baseParamName, _binarySize, _isCombined)))
-                            {
-                                ParameterTools.RemoveVRCParameter(_avDescriptor, _baseParamName);
-                                _binaryStateMachine.CreateBinaryLayer();
-                            }
-                            else
-                                EditorGUILayout.HelpBox("Parameters can not fit, or Expressions Parameters do not exist.", MessageType.Warning);
+                            // generates direct binary layer if _tab==1
+                            _binaryStateMachine.CreateBinaryLayer();
                         }
+                        else
+                            EditorGUILayout.HelpBox("Parameters can not fit, or Expressions Parameters do not exist.", MessageType.Warning);
                     }
                 }
                 else if (GUILayout.Button
@@ -444,22 +455,32 @@ namespace VRCFaceTracking.EditorTools
                 {
                     if (ParameterTools.AddVRCParameter(_avDescriptor, GenerateBinaryParams(_baseParamName, _binarySize, _isCombined)) | !_createParametersInDescriptor)
                     {
+                        // float parameter and not smoothing
                         if (_tab == 0 && !_smooth)
                         {
+                            // remove only the float parameter from the VRC avatar parameter list
                             ParameterTools.RemoveVRCParameter(_avDescriptor, new VRCExpressionParameters.Parameter
                             {
                                 name = _baseParamName,
                                 valueType = VRCExpressionParameters.ValueType.Float
                             });
+                            // create parameter in the animation controller
                             ParameterTools.CheckAndCreateParameter(_baseParamName, _animatorController, 1);
 
                             _binaryStateMachine.initClip = BinaryParameterFloatDriver.CreateFloatDriverAnimation(_baseParamName, 0f);
                             _binaryStateMachine.finalClip = BinaryParameterFloatDriver.CreateFloatDriverAnimation(_baseParamName, 1f);
                             _binaryStateMachine.finalNegativeClip = BinaryParameterFloatDriver.CreateFloatDriverAnimation(_baseParamName, -1f);
                         }
+                        // float parameter and smoothing
                         else if (_tab == 0)
                         {
-                            ParameterTools.RemoveVRCParameter(_avDescriptor, _baseParamName);
+                            // remove only the float parameter from the VRC avatar parameter list
+                            ParameterTools.RemoveVRCParameter(_avDescriptor, new VRCExpressionParameters.Parameter
+                            {
+                                name = _baseParamName,
+                                valueType = VRCExpressionParameters.ValueType.Float
+                            });
+                            // create parameter in the animation controller
                             ParameterTools.CheckAndCreateParameter(_baseParamName, _animatorController, 1);
 
                             _binaryStateMachine.CreateSmoothingLayer(_smoothness);
@@ -467,6 +488,7 @@ namespace VRCFaceTracking.EditorTools
                             _binaryStateMachine.finalClip = BinaryParameterFloatDriver.CreateFloatDriverAnimation(_baseParamName + "Proxy", 1f);
                             _binaryStateMachine.finalNegativeClip = BinaryParameterFloatDriver.CreateFloatDriverAnimation(_baseParamName + "Proxy", -1f);
                         }
+                        // generates direct binary layer if _tab==1
                         _binaryStateMachine.CreateCombinedBinaryLayer();
                     }
                     else

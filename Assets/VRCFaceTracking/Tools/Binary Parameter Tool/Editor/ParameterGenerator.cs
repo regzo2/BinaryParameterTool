@@ -132,6 +132,41 @@ namespace VRCFaceTracking.EditorTools
             return true;
         }
 
+        public static bool RemoveVRCParameter(VRCAvatarDescriptor avatarDescriptor, string parameter)
+        {
+            // Make sure Parameters aren't null
+            if (avatarDescriptor.expressionParameters == null)
+            {
+                Debug.Log("ExpressionsParameters not found!");
+                return false;
+            }
+
+            // Instantiate and Save to Database
+            VRCExpressionParameters newParameters = avatarDescriptor.expressionParameters;
+            string assetPath = AssetDatabase.GetAssetPath(avatarDescriptor.expressionParameters);
+            if (assetPath != String.Empty)
+            {
+                AssetDatabase.RemoveObjectFromAsset(avatarDescriptor.expressionParameters);
+                AssetDatabase.CreateAsset(newParameters, assetPath);
+                avatarDescriptor.expressionParameters = newParameters;
+            }
+
+            // Check and see if parameter exists
+            if (newParameters.FindParameter(parameter) != null)
+            {
+                // Remove the parameters with listed keyword
+                List<VRCExpressionParameters.Parameter> betterParametersBecauseItsAListInstead =
+                    newParameters.parameters.ToList();
+
+                // Remove without editing the collection being looped
+                betterParametersBecauseItsAListInstead = 
+                    betterParametersBecauseItsAListInstead.Where(p => !p.name.Contains(parameter)).ToList(); 
+
+                newParameters.parameters = betterParametersBecauseItsAListInstead.ToArray();
+            }
+            return true;
+        }
+
         public static AnimatorControllerParameter CheckAndCreateParameter(string paramName, AnimatorController animatorController, int type, double defaultVal = 0)
         {
             AnimatorControllerParameter param = new AnimatorControllerParameter();
