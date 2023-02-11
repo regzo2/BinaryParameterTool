@@ -60,7 +60,7 @@ namespace VRCFaceTracking.EditorTools
 
             // Clear out existing ...Binary layers to make-way for an updated one
             for (int i = 0; i < animatorController.layers.Length; i++)
-                if (animatorController.layers[i].name == baseParamName + " Binary")
+                if (animatorController.layers[i].name == NameNoSymbol(baseParamName) + " Binary")
                 {
                     animatorController.RemoveLayer(i);
                 }
@@ -68,7 +68,7 @@ namespace VRCFaceTracking.EditorTools
             // Creating a layer object since the default weight can not be assigned after creation.
             AnimatorControllerLayer layer = new AnimatorControllerLayer
             {
-                name = baseParamName + " Binary",
+                name = NameNoSymbol(baseParamName) + " Binary",
                 stateMachine = new AnimatorStateMachine
                 {
                     hideFlags = HideFlags.HideInHierarchy
@@ -108,7 +108,7 @@ namespace VRCFaceTracking.EditorTools
 
             // Clear out existing ...Binary layers to make-way for an updated one
             for (int i = 0; i < animatorController.layers.Length; i++)
-                if (animatorController.layers[i].name == baseParamName + " Binary")
+                if (animatorController.layers[i].name == NameNoSymbol(baseParamName) + " Binary")
                 {
                     animatorController.RemoveLayer(i);
                 }
@@ -116,7 +116,7 @@ namespace VRCFaceTracking.EditorTools
             // Creating a layer object since the default weight can not be assigned after creation.
             AnimatorControllerLayer layer = new AnimatorControllerLayer
             {
-                name = baseParamName + " Binary",
+                name = NameNoSymbol(baseParamName) + " Binary",
                 stateMachine = new AnimatorStateMachine
                 {
                     hideFlags = HideFlags.HideInHierarchy
@@ -187,7 +187,7 @@ namespace VRCFaceTracking.EditorTools
 
             AnimatorState[] states = new AnimatorState[binarySteps];
 
-            stateMachine.name = name + " Binary State Machine";
+            stateMachine.name = NameNoSymbol(name) + " Binary State Machine";
             stateMachine.anyStatePosition = new Vector3(20, 0, 0);
             stateMachine.entryPosition = new Vector3
             (
@@ -228,7 +228,7 @@ namespace VRCFaceTracking.EditorTools
                 // Creating all the binary states and transitions
                 for (int i = 1; i < binarySteps; i++)
                 {
-                    states[i] = stateMachine.AddState(name + i * negativeCount, new Vector3
+                    states[i] = stateMachine.AddState(NameNoSymbol(name) + i * negativeCount, new Vector3
                     (
                         stateMachine.anyStatePosition.x - 20 - Mathf.Sin(((float)i / binarySteps) * Mathf.PI * (-1) * negativeCount) * (200 + binarySteps * 8),
                         stateMachine.anyStatePosition.y - 5 - Mathf.Cos(((float)i / binarySteps) * Mathf.PI) * (100 + binarySteps * 4),
@@ -263,7 +263,7 @@ namespace VRCFaceTracking.EditorTools
                         blendType = BlendTreeType.Simple1D,
                         hideFlags = HideFlags.HideInHierarchy,
                         blendParameter = "BinaryBlend",
-                        name = name + (i * negativeCount),
+                        name = NameNoSymbol(name) + (i * negativeCount),
                         useAutomaticThresholds = false
                     };
 
@@ -308,7 +308,7 @@ namespace VRCFaceTracking.EditorTools
             for (int i = 0; i < binarySteps; i++)
             {
 
-                stateMachine.name = name + " Binary State Machine";
+                stateMachine.name = NameNoSymbol(name) + " Binary State Machine";
                 stateMachine.anyStatePosition = new Vector3(20, 0, 0);
                 stateMachine.entryPosition = new Vector3
                 (
@@ -318,7 +318,7 @@ namespace VRCFaceTracking.EditorTools
                 );
 
 
-                states[i] = stateMachine.AddState(name + i, new Vector3
+                states[i] = stateMachine.AddState(NameNoSymbol(name) + i, new Vector3
                 (
                     stateMachine.anyStatePosition.x - 20 - Mathf.Sin((i / (float)binarySteps) * Mathf.PI * 2f) * (200 + binarySteps * 8),
                     stateMachine.anyStatePosition.y - 5 - Mathf.Cos((i / (float)binarySteps) * Mathf.PI * 2f) * (100 + binarySteps * 4),
@@ -349,7 +349,7 @@ namespace VRCFaceTracking.EditorTools
                     blendType = BlendTreeType.Simple1D,
                     hideFlags = HideFlags.HideInHierarchy,
                     blendParameter = "BinaryBlend",
-                    name = name + i,
+                    name = NameNoSymbol(name) + i,
                     useAutomaticThresholds = false,
                 };
 
@@ -367,6 +367,7 @@ namespace VRCFaceTracking.EditorTools
             }
         }
 
+        // implement next update pls
         private static void CreateBranchingBinaryStatesInMachine(string name, int binarySize, AnimatorStateMachine stateMachine, AnimationClip initClip, AnimationClip finalClip, bool writeDefaults, float duration, bool nextStateInterrupt, float min, float max, AnimationClip finalNegativeClip = null, float minNeg = 0, float maxNeg = 0)
         {
             // Skips creating the negative & positive branch
@@ -380,7 +381,7 @@ namespace VRCFaceTracking.EditorTools
             int minSteps = (int)((min + .05) * binarySteps);
             int maxSteps = (int)((max - .05) * binarySteps);
 
-            stateMachine.name = name + " Binary State Machine";
+            stateMachine.name = NameNoSymbol(name) + " Binary State Machine";
             stateMachine.entryPosition = new Vector3(0, 20, 0);
             stateMachine.anyStatePosition = new Vector3
             (
@@ -417,7 +418,7 @@ namespace VRCFaceTracking.EditorTools
                     blendType = BlendTreeType.Simple1D,
                     hideFlags = HideFlags.HideInHierarchy,
                     blendParameter = "BinaryBlend",
-                    name = name + i,
+                    name = NameNoSymbol(name) + i,
                     useAutomaticThresholds = false,
                 };
 
@@ -499,7 +500,7 @@ namespace VRCFaceTracking.EditorTools
 
             // Clear out existing ...Binary layers to make-way for an updated one
             for (int i = 0; i < animatorController.layers.Length; i++)
-                if (animatorController.layers[i].name == baseParamName + " Float Smoother")
+                if (animatorController.layers[i].name == NameNoSymbol(baseParamName) + " Float Smoother")
                 {
                     animatorController.RemoveLayer(i);
                 }
@@ -507,7 +508,7 @@ namespace VRCFaceTracking.EditorTools
             // Creates an animation layer
             AnimatorControllerLayer layer = new AnimatorControllerLayer
             {
-                name = baseParamName + " Float Smoother",
+                name = NameNoSymbol(baseParamName) + " Float Smoother",
                 stateMachine = new AnimatorStateMachine
                 {
                     hideFlags = HideFlags.HideInHierarchy
@@ -569,6 +570,21 @@ namespace VRCFaceTracking.EditorTools
             AnimatorState state = layer.stateMachine.AddState("Smoother");
 
             state.motion = rootTree;
+        }
+
+        public static string NameNoSymbol(string name)
+        {
+            string nameNoSym = "";
+
+            for (int j = 0; j < name.Length; j++)
+            {
+                if (name[j] != '/')
+                {
+                    nameNoSym += name[j];
+                }
+
+            }
+            return nameNoSym;
         }
 
     }
