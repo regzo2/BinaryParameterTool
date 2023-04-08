@@ -1,3 +1,31 @@
+# NOTICE
+### **Binary Parameter Tool is no longer maintained or supported.** 
+
+The Binary animation conversion generated using this tool is 
+very outdated and is superceeded by other projects. Please consider using 
+these other projects as superior alternatives to Binary Parameter Tool. 
+These other tools provide more stable and cleaner Binary parameter conversions 
+for VRCFaceTracking.
+
+* [Razgriz's VRCFTGenerator](https://github.com/rrazgriz/VRCFTGenerator) (All-in-One VRCFT animation tool)
+* OSCmooth [Binary Parameters](https://github.com/Adjerry91/OSCmooth/releases/tag/V1.1.1-BETA) fork (Directly generates smoothed out Binary parameters).
+
+### To further drive this point, I am taking down all releases of this tool. 
+The source will still be available but 
+seriously consider these other projects for Binary parameter implementations. 
+
+### Thank you for your support so far! 
+This was one of my very first forrays into Unity tool development. I've learned a lot 
+by making this tool. There is definitely a lot I can definitely improve upon, but I am happy with where this tool has 
+lead me from a learning perspective. I hope to make more awesome stuff in the future!
+
+***
+
+# **The rest of the README is for archival purposes.**
+Information below is no longer applicable or accurate. Please consider the linked above projects instead.
+
+***
+
 # Binary Parameter Tool
 ### Simple Unity Editor tool that helps create Animation Layers that a Binary Parameter can interface with for the VRCFaceTracking Melonloader mod.
 
